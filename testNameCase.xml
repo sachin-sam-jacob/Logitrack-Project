@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+
+    <!-- ================= BACKEND : Spring Boot ================= -->
+
+    <!-- LogisticsManagementAndTrackingSystemApplicationTests.java -->
+
+    <property name="backend.register.business"
+              value="User registration as BUSINESS role"/>
+
+    <property name="backend.register.customer"
+              value="User registration as CUSTOMER role"/>
+
+    <property name="backend.register.driver"
+              value="User registration as DRIVER role"/>
+
+    <property name="backend.login.success"
+              value="User login with valid credentials"/>
+
+    <property name="backend.login.failure"
+              value="User login with invalid credentials"/>
+
+    <property name="backend.customer.viewCargoStatus"
+              value="Customer can view cargo status"/>
+
+    <property name="backend.driver.updateCargoStatus"
+              value="Driver can update cargo status"/>
+
+    <property name="backend.driver.viewAssignedCargos"
+              value="Driver can view assigned cargos"/>
+
+    <property name="backend.business.viewAllCargos"
+              value="Business can view all cargos"/>
+
+    <property name="backend.business.assignCargo"
+              value="Business can assign cargo to driver"/>
+
+    <property name="backend.business.addCargo"
+              value="Business can add new cargo"/>
+
+    <property name="backend.permission.business"
+              value="Unauthorized access blocked for business endpoints"/>
+
+    <property name="backend.permission.driver"
+              value="Unauthorized access blocked for driver endpoints"/>
+
+    <property name="backend.permission.customer"
+              value="Unauthorized access blocked for customer endpoints"/>
+
+    <!-- ================= FRONTEND : Angular ================= -->
+
+    <!-- AddcargoComponent.spec.ts -->
+
+    <property name="frontend.addCargo.form.invalid"
+              value="AddcargoComponent form invalid when fields are empty"/>
+
+    <property name="frontend.addCargo.form.valid"
+              value="AddcargoComponent form valid when all fields are filled"/>
+
+    <!-- HttpService.spec.ts -->
+
+    <property name="frontend.httpService.create"
+              value="HttpService should be created"/>
+
+    <property name="frontend.httpService.getOrderStatus"
+              value="HttpService fetches cargo order status"/>
+
+    <property name="frontend.httpService.updateCargoStatus"
+              value="HttpService updates cargo status"/>
+
+    <property name="frontend.httpService.assignDriver"
+              value="HttpService assigns driver to cargo"/>
+
+    <property name="frontend.httpService.getAssignedOrders"
+              value="HttpService fetches assigned orders for driver"/>
+
+    <property name="frontend.httpService.getCargo"
+              value="HttpService fetches cargo list for business"/>
+
+    <property name="frontend.httpService.getDrivers"
+              value="HttpService fetches drivers list"/>
+
+    <property name="frontend.httpService.addCargo"
+              value="HttpService adds new cargo"/>
+
+    <property name="frontend.httpService.login"
+              value="HttpService login API"/>
+
+    <property name="frontend.httpService.register"
+              value="HttpService user registration API"/>
+
+    <!-- LoginComponent.spec.ts -->
+
+    <property name="frontend.login.form.invalid.empty"
+              value="LoginComponent form invalid when fields are empty"/>
+
+    <property name="frontend.login.form.invalid.partial"
+              value="LoginComponent form invalid when one field is missing"/>
+
+    <property name="frontend.login.form.valid"
+              value="LoginComponent form valid when username and password provided"/>
+
+    <!-- RegistrationComponent.spec.ts -->
+
+    <property name="frontend.registration.form.invalid"
+              value="RegistrationComponent form invalid when fields are empty"/>
+
+    <property name="frontend.registration.form.invalidEmail"
+              value="RegistrationComponent invalid email validation"/>
+
+    <property name="frontend.registration.form.valid"
+              value="RegistrationComponent form valid with correct inputs"/>
+
+</properties>
