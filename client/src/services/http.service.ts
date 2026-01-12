@@ -8,6 +8,10 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class HttpService {
-  //todo: complete missing code..
+  public apiUrl=environment.apiUrl;
+  constructor(private http:HttpClient){}
+  registerUser(details:any):Observable<any>{
+   return this.http.post(`${this.apiUrl}`,details);
+  }
   
 }
