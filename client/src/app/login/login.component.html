@@ -1,1 +1,37 @@
 //todo: complete missing code..
+<div>
+    <form [formGroup]="itemForm" (ngSubmit)="onLogin()">
+        <h2>LOGISTIC MANAGEMENT SYSTEM</h2>
+        <p>please enter your user and password!</p>
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter your username" formControlName="username">
+            <div
+                *ngIf="itemForm.get('username')?.invalid && (itemForm.get('username')?.touched || itemForm.get('username')?.dirty )">
+                <div *ngIf="itemForm.get('username')?.errors?.['required']">
+                    Username is required
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="********" formControlName="password">
+            <div
+                *ngIf="itemForm.get('password')?.invalid && (itemForm.get('password')?.touched || itemForm.get('password')?.dirty )">
+                <div *ngIf="itemForm.get('password')?.errors?.['required']">
+                    Password is required
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <input type="submit" value="Login" [disabled]="itemForm.invalid">
+        </div>
+
+        <p>Don't have an account? <a>Registration</a></p>
+
+
+    </form>
+</div>
