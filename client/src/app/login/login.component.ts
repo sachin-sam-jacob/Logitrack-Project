@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
   onLogin() {
   if(this.itemForm.valid){
     const loginDetails=this.itemForm.value;
-    this.httpService.login(loginDetails).subscribe(
+    this.httpService.Login(loginDetails).subscribe(
       (response:any)=>{
         console.log("Login done successfully!")
       },
