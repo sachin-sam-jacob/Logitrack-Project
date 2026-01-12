@@ -9,8 +9,39 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './viewcargostatus.component.html',
   styleUrls: ['./viewcargostatus.component.scss']
 })
-export class ViewcargostatusComponent 
+export class ViewcargostatusComponent implements OnInit{
+  cargo:any={};
+  
+  showError:any;
+  errorMessage:any;
+  cargoIdMd:any;
+  searchMade:any;
+
+  constructor(private httpService:HttpService){
+
+  }
+  ngOnInit(): void {
     
-  //todo: complete missing code..
+  }
+  search(){
+    if(this.cargoIdMd){
+      this.httpService.getOrderStatus(this.cargoIdMd).subscribe((data)=>
+      {
+        this.cargo = data;
+        this.showError=false;
+      },(error)=>
+      {
+        this.showError=true;
+        this.errorMessage = 'An error occurred while fetching the cargo status. Please try again.'
+      })
+    }
+    else{
+      this.showError = true
+    }
+  }
+
+}
+    
+  
 
 
