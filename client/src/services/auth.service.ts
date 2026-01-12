@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -5,53 +6,50 @@ import { Injectable } from '@angular/core';
 })
 export class AuthService {
 
-  private token:string|null=null;
-  private isLoggedIn:boolean=false;
 
-  constructor(){
+  private token: string | null = null;
+  private isLoggedIn: boolean = false;
 
+  constructor() {}
+
+  saveToken(token: string) {
+    this.token = token;
+    this.isLoggedIn = true;
+    localStorage.setItem('token', token);
   }
-  saveToken(token:string){
-    this.token=token;
-    this.isLoggedIn=true;
-    localStorage.setItem('token',token);
-  }
-
-  setRole(role:any){
+   SetRole(role:any)
+  {
     localStorage.setItem('role',role);
   }
-
-  get getRole():string|null{
+  get getRole ():string|null
+  {
     return localStorage.getItem('role');
   }
-
-  setUsername(username:any){
+  SetUsername(username:any){
     localStorage.setItem('username',username)
   }
 
   get getUsername ():string|null{
     return localStorage.getItem('username');
   }
-
-  setId(id:any)
+  SetId(id:any)
   {
     localStorage.setItem('id',id);
   }
-  
   get getId ():string|null
   {
     return localStorage.getItem('id');
   }
-
-  get getLoginStatus():boolean{
-    return !!localStorage.getItem('token');
+  
+  get getLoginStatus(): boolean {
+  
+      return !!localStorage.getItem('token');
+   
   }
-
   getToken(): string | null {
    this.token= localStorage.getItem('token');
     return this.token;
   }
-
   logout(){
     localStorage.removeItem('token');
     localStorage.removeItem('role');
