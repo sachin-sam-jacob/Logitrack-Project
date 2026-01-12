@@ -1,1 +1,80 @@
-//todo: Complete missing code..
+<div class="container">
+    <h2>LOGISTIC MANAGEMENT SYSTEM</h2>
+    <p>Please enter your details</p>
+
+    <form [formGroup]="itemForm" (ngSubmit)="onRegister()">
+        <div>
+            <label for="username">Usern=me</label>
+            <input type="text" id="username" name="username" formControlName="username" placeholder="Enter your Username">
+            <div *ngIf="itemForm.get('username')?.invalid && (itemForm.get('username')?.dirty || itemForm.get('username')?.touched)">
+                <div *ngIf="itemForm.get('username')?.errors?.['required']">
+                    <p>* Username is required *</p>
+                </div>
+                <div *ngIf="itemForm.get('username')?.errors?.['minlength']">
+                    <p>* Username should contains minimum 8 characters *</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" formControlName="email" placeholder="Enter your Email Address" >
+            <div *ngIf="itemForm.get('email')?.invalid && (itemForm.get('email')?.dirty || itemForm.get('email')?.touched)">
+                <div *ngIf="itemForm.get('email')?.errors?.['required']">
+                    <p>* Email Address is Required *</p>
+                </div>
+                <div *ngIf="itemForm.get('email')?.errors?.['email']">
+                    <p>* Email is invalid *</p>
+                </div>
+            </div>
+        </div>
+
+        <div *ngIf="itemForm.get('password')?.invalid &&
+           (itemForm.get('password')?.dirty || itemForm.get('password')?.touched)">
+ 
+            <p *ngIf="itemForm.get('password')?.errors?.['required']">
+                * Password is required *
+            </p>
+            
+            <p *ngIf="itemForm.get('password')?.errors?.['invalidMinLength']">
+                * Minimum 8 characters required *
+            </p>
+            
+            <p *ngIf="itemForm.get('password')?.errors?.['missingLowerCase']">
+                * At least one lowercase letter required *
+            </p>
+            
+            <p *ngIf="itemForm.get('password')?.errors?.['missingUpperCase']">
+                * At least one uppercase letter required *
+            </p>
+            
+            <p *ngIf="itemForm.get('password')?.errors?.['missingDigit']">
+                * At least one digit required *
+            </p>
+            
+            <p *ngIf="itemForm.get('password')?.errors?.['missingSpecial']">
+                * At least one special character required *
+            </p>
+            
+            </div>
+
+
+        <div>
+            <label for="role">Role</label>
+            <select id="role" name="role" formControlName="role" >
+                <option *ngFor="let role of roles" [value]="role" [disabled]="role === 'Choose Role'">
+                    {{ role }}
+                </option>
+            </select>
+            <div *ngIf="itemForm.get('role')?.invalid && (itemForm.get('role')?.dirty || itemForm.get('role')?.touched)">
+                <div *ngIf="itemForm.get('role')?.errors?.['required']">
+                    <p>* Role is required *</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <button type="submit" [disabled]="itemForm.invalid">Register</button>
+        </div>
+    </form>
+</div>
