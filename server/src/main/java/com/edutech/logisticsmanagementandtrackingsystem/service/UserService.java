@@ -17,36 +17,6 @@ import java.util.List;
  
  
 @Service
-public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
- 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
- 
-    public User registerUser(User user) {
-        User user1 = userRepository.findByUsername(user.getUsername());
-        if (user1 == null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return userRepository.save(user);
-        } else {
-            return null;
-        }
-    }
-    
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
- 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("User not found");
-        }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                new ArrayList<>());
-    }
+public class UserService {
+   
 }

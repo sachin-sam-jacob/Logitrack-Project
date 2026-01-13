@@ -15,12 +15,7 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoReposito
 import com.edutech.logisticsmanagementandtrackingsystem.repository.DriverRepository;
  
  
-@Service
+
 public class BusinessService {
-    @Autowired
-    private BusinessRepository businessRepository;
- 
-    public Business registerBusiness(Business business) {
-        return this.businessRepository.save(business);
-    }
+
 }

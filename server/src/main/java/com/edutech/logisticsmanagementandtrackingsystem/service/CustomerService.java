@@ -9,30 +9,9 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoReposito
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CustomerRepository;
  
  
-@Service
+
 public class CustomerService {
 
-    @Autowired
-    private CustomerRepository customerRepository;
- 
-    @Autowired
-    private CargoRepository cargoRepository;
- 
-    public Customer createCustomer(Customer customer) {
-         return customerRepository.save(customer);
- 
-    }
- 
-    public CargoStatusResponse viewCargoStatus(Long cargoId){
-        Cargo cargo = (cargoRepository.findById(cargoId)).orElse(null);
-        if (cargo != null) {
-            return new CargoStatusResponse(cargo.getId(), cargo.getStatus());
-
-        } else {
-            throw new EntityNotFoundException("Cargo with this Id doesn't exists.");
-        }
- 
-    }
 
 }
  
