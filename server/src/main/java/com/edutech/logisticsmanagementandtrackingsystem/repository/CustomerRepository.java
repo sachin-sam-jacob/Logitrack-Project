@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Customer;
 
-
-public interface CustomerRepository  {
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer,Long>{
     // extends JpaRepository and add custom methods if needed
 }
