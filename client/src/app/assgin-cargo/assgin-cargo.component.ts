@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth.service';
  
 @Component({
   selector: 'app-assign-cargo',
-  templateUrl: './assign-cargo.component.html'
+  templateUrl: './assgin-cargo.component.html'
 })
 export class AssginCargoComponent implements OnInit {
  
