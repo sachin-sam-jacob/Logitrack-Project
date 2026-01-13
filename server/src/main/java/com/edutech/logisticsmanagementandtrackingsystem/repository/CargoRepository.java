@@ -9,7 +9,7 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.Cargo;
 import java.util.List;
 
 
-public interface CargoRepository {
-    // extend jpa repository to add custom query methods if needed
-
+@Repository
+public interface CargoRepository extends JpaRepository<Cargo,Long>{
+    
 }

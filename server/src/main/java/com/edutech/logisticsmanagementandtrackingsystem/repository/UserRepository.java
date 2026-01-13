@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
 
-
-public interface UserRepository  {
-    // extend jpa repository and add custom methods if needed
+@Repository
+public interface UserRepository extends JpaRepository<User,Long> {
+   
 }
