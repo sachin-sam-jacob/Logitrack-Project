@@ -15,7 +15,14 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoReposito
 import com.edutech.logisticsmanagementandtrackingsystem.repository.DriverRepository;
  
  
-
+@Service
 public class BusinessService {
-
+    //Dependency Injection
+    @Autowired
+    private BusinessRepository businessRepository;
+ 
+    public Business registerBusiness(Business business) {
+        // save business to database
+        return this.businessRepository.save(business);
+    }
 }
