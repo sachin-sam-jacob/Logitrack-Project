@@ -8,5 +8,4 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.Customer;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer,Long>{
-    // extends JpaRepository and add custom methods if needed
 }

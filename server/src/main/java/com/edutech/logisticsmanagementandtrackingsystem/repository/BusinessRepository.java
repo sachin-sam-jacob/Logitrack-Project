@@ -8,5 +8,4 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.Business;
 
 @Repository
 public interface BusinessRepository extends JpaRepository<Business,Long> {
-    // extend jpa repository and add custom methods if needed
 }
