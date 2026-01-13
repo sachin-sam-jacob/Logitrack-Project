@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Driver;
 @Repository
 public interface DriverRepository extends JpaRepository<Driver,Long> {
-    
+        public Driver findByName(String name);
+
 }
 

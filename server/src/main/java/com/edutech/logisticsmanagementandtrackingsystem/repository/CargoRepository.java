@@ -11,5 +11,8 @@ import java.util.List;
 
 @Repository
 public interface CargoRepository extends JpaRepository<Cargo,Long>{
-    
+     List<Cargo> findByBusinessId(Long businessId);
+
+    // give a list of assigned cargo based on driver id
+    List<Cargo> findByDriverId(Long driverId);
 }
