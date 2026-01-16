@@ -3,7 +3,7 @@ package com.edutech.logisticsmanagementandtrackingsystem.service;
  
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -25,7 +25,6 @@ import java.util.List;
  
  
 @Service
-
 public class UserService implements UserDetailsService {
  
     // Dependency Injections
@@ -84,7 +83,7 @@ public class UserService implements UserDetailsService {
 
                 user.getPassword(),
 
-                new ArrayList<>());
+                AuthorityUtils.createAuthorityList(user.getRole()));
 
     }
 

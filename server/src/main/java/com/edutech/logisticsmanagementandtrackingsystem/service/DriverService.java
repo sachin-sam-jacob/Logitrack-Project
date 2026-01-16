@@ -41,16 +41,14 @@ public class DriverService {
     }
  
     public List<Cargo> viewDriverCargos(Long driverId) {
-        // get assigned cargos of driver from database
-        // User user = userRepository.findById(driverId).get();
-        // Driver driver = driverRepository.findByName(user.getUsername());
-        // if(driver == null)
-        //     throw new EntityNotFoundException("No driver with such username.");
-        // if(cargoRepository.findByDriverId(driver.getId()) != null)
-        //     return cargoRepository.findByDriverId(driver.getId());
-        // else
-        //     throw new EntityNotFoundException("No cargos associated with this driver");
-         return cargoRepository.findByDriverId(driverId);
+        User user = userRepository.findById(driverId).get();
+        Driver driver = driverRepository.findByName(user.getUsername());
+        if(driver == null)
+            throw new EntityNotFoundException("No driver with such username.");
+        if(cargoRepository.findByDriverId(driver.getId()) != null)
+            return cargoRepository.findByDriverId(driver.getId());
+        else
+            throw new EntityNotFoundException("No cargos associated with this driver");
  
     }
  

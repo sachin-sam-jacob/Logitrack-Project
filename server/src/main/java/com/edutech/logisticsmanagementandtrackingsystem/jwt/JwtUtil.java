@@ -39,23 +39,20 @@ public class JwtUtil {
  
     
     public String generateToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration * 1000);
-        User user = userRepository.findByUsername(username);
- 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("sub", username);
- 
-        
-        claims.put("role", user.getRole());
- 
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(getSignKey(), SignatureAlgorithm.HS512)
-                .compact();
-    }
+
+    User user = userRepository.findByUsername(username);
+
+    Date now = new Date();
+    Date expiryDate = new Date(now.getTime() + expiration * 1000);
+
+    return Jwts.builder()
+            .setSubject(username)
+            .claim("role", user.getRole())
+            .setIssuedAt(now)
+            .setExpiration(expiryDate)
+            .signWith(getSignKey(), SignatureAlgorithm.HS512)
+            .compact();
+}
  
     
     public Claims extractAllClaims(String token) {
