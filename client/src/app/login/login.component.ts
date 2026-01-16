@@ -4,8 +4,7 @@ import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
 
-
-
+declare const Swal: any;
 
 @Component({
   selector: 'app-login',
@@ -13,40 +12,77 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  itemForm: FormGroup;
-  formModel:any={};
-  showError:boolean=false;
-  errorMessage:any;
-  constructor(public router:Router, public httpService:HttpService, private formBuilder: FormBuilder, private authService:AuthService) 
-    {
-      this.itemForm = this.formBuilder.group({
-       username:['',[Validators.required]],
-       password:['',[Validators.required]]
+
+  itemForm!: FormGroup;
+
+  constructor(
+    public router: Router,
+    public httpService: HttpService,
+    private formBuilder: FormBuilder,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.itemForm = this.formBuilder.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 
-  ngOnInit(): void {
-  }
-  onLogin() {
-  if(this.itemForm.valid){
-    const loginDetails=this.itemForm.value;
-    this.httpService.Login(loginDetails).subscribe(
-      (response:any)=>{
-        console.log("Login done successfully!")
-      },
-      (error:any)=>{
-        this.showError=true;
-        this.errorMessage='Invalid username or password';
-      }
-    );
-  } else{
-    this.showError=true;
-    this.errorMessage='Please fill the fields';
-  }
-}
+  onLogin(): void {
+    if (this.itemForm.invalid) {
+      this.itemForm.markAllAsTouched();
 
-registration()
-  {
-    this.router.navigateByUrl('registration')
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Form',
+        text: 'Please enter both username and password',
+        confirmButtonColor: '#3085d6'
+      });
+      return;
+    }
+
+    this.httpService.Login(this.itemForm.value).subscribe({
+      next: (data: any) => {
+        if (data && data.token) {
+
+          localStorage.setItem('role', data.role);
+          this.authService.SetId(data.id);
+          this.authService.SetRole(data.role);
+          this.authService.saveToken(data.token);
+          this.authService.setUsername(data.username);
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: `Welcome back, ${data.username}!`,
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            this.router.navigateByUrl('/dashboard');
+          });
+
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Wrong username or password',
+            confirmButtonColor: '#d33'
+          });
+        }
+      },
+      error: () => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Authentication Error',
+          text: 'Invalid username or password. Please try again.',
+          confirmButtonColor: '#d33'
+        });
+      }
+    });
+  }
+
+  registration(): void {
+    this.router.navigateByUrl('/registration');
   }
 }

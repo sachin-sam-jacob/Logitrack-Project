@@ -1,3 +1,82 @@
-<div class="row text-center">
-<h1 class="text-capitalize">Welcome to Logistic Management System</h1>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- LOGO -->
+    <div class="logo">
+      <span class="logo-icon">🚚</span>
+      <span class="logo-text">LogiTrack</span>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="profile">
+      <div class="avatar">{{ username?.charAt(0) | uppercase }}</div>
+      <div class="profile-info">
+        <p class="name">{{ username }}</p>
+        <span class="role">{{ roleName }}</span>
+      </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="nav">
+
+      <!-- ================= BUSINESS ================= -->
+      <ng-container *ngIf="roleName === 'BUSINESS'">
+        <a routerLink="/dashboard/add-cargo" routerLinkActive="active">
+          ➕ Add Cargo
+        </a>
+
+        <!-- <a routerLink="/dashboard/assign-cargo" routerLinkActive="active">
+          👤 Assign Cargo
+        </a> -->
+
+        <a routerLink="/dashboard/view-business-cargo" routerLinkActive="active">
+          📦 View Cargos
+        </a>
+
+        <a routerLink="/dashboard/drivers" routerLinkActive="active">
+          🚚 Drivers
+        </a>
+      </ng-container>
+
+      <!-- ================= DRIVER ================= -->
+      <ng-container *ngIf="roleName === 'DRIVER'">
+        <a routerLink="/dashboard/assign-cargo" routerLinkActive="active">
+          📦 My Assigned Cargos
+        </a>
+
+        <a routerLink="/dashboard/update-status" routerLinkActive="active">
+          🔄 Update Cargo Status
+        </a>
+      </ng-container>
+
+      <!-- ================= CUSTOMER ================= -->
+      <ng-container *ngIf="roleName === 'CUSTOMER'">
+        <a routerLink="/dashboard/view-cargo" routerLinkActive="active">
+          🔍 Track Cargo
+        </a>
+      </ng-container>
+
+    </nav>
+
+    <!-- LOGOUT -->
+    <button class="logout" (click)="logout()">
+      🚪 Logout
+    </button>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="content">
+
+    <header class="header">
+      <h1>Welcome, <span>{{ username }}</span></h1>
+    </header>
+
+    <!-- CHILD ROUTES LOAD HERE -->
+    <router-outlet></router-outlet>
+
+  </main>
+
 </div>

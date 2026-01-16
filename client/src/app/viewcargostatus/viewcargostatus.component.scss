@@ -1,108 +1,158 @@
-/* Container */
-.container {
-  max-width: 520px;
-  margin: 60px auto;
-  padding: 32px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.status-container {
+  padding: 24px;
+  max-width: 900px;
+  margin: auto;
 }
 
-/* Heading */
-.container h2 {
-  text-align: center;
-  margin-bottom: 24px;
-  color: #2c3e50;
-  font-size: 24px;
-  font-weight: 600;
+.page-header {
+  margin-bottom: 20px;
+
+  h2 {
+    font-size: 26px;
+    font-weight: 600;
+    color: #1f2937;
+  }
+
+  p {
+    color: #6b7280;
+    margin-top: 4px;
+  }
 }
 
-/* Form Group */
-.form-group {
+/* SEARCH */
+.search-card {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  input {
+    flex: 1;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    font-size: 15px;
+    outline: none;
+
+    &:focus {
+      border-color: #2563eb;
+    }
+  }
+
+  button {
+    padding: 12px 20px;
+    border: none;
+    background: #2563eb;
+    color: white;
+    font-weight: 500;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    &:hover {
+      background: #1e40af;
+    }
+  }
 }
 
-/* Label */
-.form-group label {
-  font-weight: 500;
-  color: #34495e;
-}
-
-/* Input */
-.form-control {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #dcdcdc;
-  font-size: 14px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-control:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-  outline: none;
-}
-
-/* Button */
-button {
-  margin-top: 12px;
-  padding: 10px;
-  background: linear-gradient(135deg, #3498db, #2980b9);
-  color: #ffffff;
-  border: none;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(52, 152, 219, 0.3);
-}
-
-/* Error Message */
-div[ng-reflect-ng-if="true"] {
-  margin-top: 16px;
+/* ERROR */
+.error-box {
+  background: #fee2e2;
+  color: #b91c1c;
   padding: 12px;
-  background-color: #fdecea;
-  color: #c0392b;
   border-radius: 8px;
-  font-size: 14px;
+  margin-bottom: 16px;
 }
 
-/* Cargo Details */
-h3 {
-  margin-top: 28px;
-  margin-bottom: 14px;
-  color: #2c3e50;
-  font-size: 20px;
+/* CARGO CARD */
+.cargo-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* HEADER */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+/* STATUS BADGE */
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
+  text-transform: uppercase;
+
+  &.created {
+    background: #e0f2fe;
+    color: #0369a1;
+  }
+
+  &.in_transit {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.delivered {
+    background: #dcfce7;
+    color: #166534;
+  }
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-  background: #f9fbfc;
-  border-radius: 10px;
-  padding: 16px;
+/* DETAILS GRID */
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+
+  label {
+    font-size: 13px;
+    color: #6b7280;
+  }
+
+  p {
+    font-size: 15px;
+    font-weight: 500;
+    color: #111827;
+  }
 }
 
-ul li {
-  padding: 8px 0;
-  border-bottom: 1px solid #eaeaea;
-  font-size: 14px;
-  color: #34495e;
+/* TIMELINE */
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+
+  .step {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    border-radius: 8px;
+    background: #e5e7eb;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 0 4px;
+    color: #374151;
+  }
+
+  .completed {
+    background: #2563eb;
+    color: white;
+  }
 }
 
-ul li:last-child {
-  border-bottom: none;
-}
-
-ul li strong {
-  color: #2c3e50;
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .search-card {
+    flex-direction: column;
+  }
 }

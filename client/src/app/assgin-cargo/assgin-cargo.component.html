@@ -1,1 +1,58 @@
-//todo: Complete missing code..
+<div class="assign-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h2>📦 Update Cargo Status</h2>
+    <p>Manage delivery progress of assigned cargos</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert error" *ngIf="showError">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success Message -->
+  <div class="alert success" *ngIf="showMessage">
+    {{ responseMessage }}
+  </div>
+
+  <!-- Cargo Table -->
+  <div class="card">
+    <table class="cargo-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Content</th>
+          <th>Size</th>
+          <th>Status</th>
+          <th>Update</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let cargo of cargList">
+          <td>#{{ cargo.id }}</td>
+          <td>{{ cargo.content }}</td>
+          <td>{{ cargo.size }}</td>
+          <td>
+            <span class="status-badge">{{ cargo.status }}</span>
+          </td>
+          <td class="action-cell">
+            <select
+              (change)="onStatusChange($any($event.target).value, cargo.id)">
+              <option value="">Select Status</option>
+              <option value="PICKED_UP">Picked Up</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="DELIVERED">Delivered</option>
+            </select>
+
+            <button class="btn-update" (click)="updateStatus()">
+              Update
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>

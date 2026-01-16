@@ -1,0 +1,59 @@
+<div class="business-cargo-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h2>📦 My Cargos</h2>
+    <p>View and track all cargos created by your business</p>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search by Cargo ID / Content / Status"
+      [(ngModel)]="keyword"
+      (keyup.enter)="search()"
+    />
+    <button (click)="search()">Search</button>
+  </div>
+
+  <!-- Cargo Table -->
+  <div class="card" *ngIf="cargos.length > 0">
+    <table class="cargo-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Content</th>
+          <th>Size</th>
+          <th>Status</th>
+          <th>Driver</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let cargo of cargos">
+          <td>#{{ cargo.id }}</td>
+          <td>{{ cargo.content }}</td>
+          <td>{{ cargo.size }}</td>
+          <td>
+            <span
+              class="status-badge"
+              [ngClass]="cargo.status.toLowerCase()"
+            >
+              {{ cargo.status }}
+            </span>
+          </td>
+          <td>
+            {{ cargo.driver?.name || 'Not Assigned' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- No Data -->
+  <div class="empty-state" *ngIf="cargos.length === 0">
+    <p>🚫 No cargos found</p>
+  </div>
+
+</div>

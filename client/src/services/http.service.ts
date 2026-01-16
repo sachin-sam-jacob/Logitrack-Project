@@ -169,4 +169,22 @@ export class HttpService {
     return this.http.get(this.serverName+`/api/customer/cargo-details?cargoId=`+cargoId,{headers:headers});
   }
 
+
+  getMyCargos() {
+     const authToken = this.authService.getToken();
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', `Bearer ${authToken}`)
+  return this.http.get(`${this.serverName}/api/business/my-cargos`, {headers:headers});
+}
+
+searchMyCargos(keyword: string) {
+   const authToken = this.authService.getToken();
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+    headers = headers.set('Authorization', `Bearer ${authToken}`)
+  return this.http.get(`${this.serverName}/api/business/search-cargo?keyword=${keyword}`, {headers:headers});
+}
+
+
 }

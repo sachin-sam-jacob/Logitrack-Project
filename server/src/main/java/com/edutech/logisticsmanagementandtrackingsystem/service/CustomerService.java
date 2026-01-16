@@ -28,15 +28,21 @@ public class CustomerService {
  
     }
  
-    public CargoStatusResponse viewCargoStatus(Long cargoId){
-        // Find the cargo by its id and return the status
- 
-        Cargo cargo = (cargoRepository.findById(cargoId)).orElse(null);
-        if (cargo != null) {
-            return new CargoStatusResponse(cargo.getId(), cargo.getStatus());
-        } else {
-            throw new EntityNotFoundException("Cargo with this Id doesn't exists.");
-        }
- 
+     public CargoStatusResponse viewCargoStatus(Long cargoId) {
+
+        Cargo cargo = cargoRepository.findById(cargoId)
+                .orElseThrow(() -> new EntityNotFoundException("Cargo not found"));
+
+        String driverName = cargo.getDriver() != null
+                ? cargo.getDriver().getName()
+                : "Not Assigned";
+
+        return new CargoStatusResponse(
+                cargo.getId(),
+                cargo.getContent(),
+                cargo.getSize(),
+                cargo.getStatus(),
+                driverName
+        );
     }
 }

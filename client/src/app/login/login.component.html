@@ -1,36 +1,34 @@
-<div>
-    <form [formGroup]="itemForm" (ngSubmit)="onLogin()">
-        <h2>LOGISTIC MANAGEMENT SYSTEM</h2>
-        <p>please enter your user and password!</p>
-        <div>
-            <label for="username">Username</label>
-            <input type="text" id="username" placeholder="Enter your username" formControlName="username">
-            <div
-                *ngIf="itemForm.get('username')?.invalid && (itemForm.get('username')?.touched || itemForm.get('username')?.dirty )">
-                <div *ngIf="itemForm.get('username')?.errors?.['required']">
-                    Username is required
-                </div>
-            </div>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-left">
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png"
+        alt="Login"
+      />
+    </div>
+
+    <div class="auth-right">
+      <h2>Welcome Back 👋</h2>
+      <p>Please login to continue</p>
+
+      <form [formGroup]="itemForm" (ngSubmit)="onLogin()">
+        <div class="input-group">
+          <label>Username</label>
+          <input type="text" formControlName="username" placeholder="Enter username" />
         </div>
 
-
-        <div>
-            <label for="password">Password</label>
-            <input type="password" id="password" placeholder="********" formControlName="password">
-            <div
-                *ngIf="itemForm.get('password')?.invalid && (itemForm.get('password')?.touched || itemForm.get('password')?.dirty )">
-                <div *ngIf="itemForm.get('password')?.errors?.['required']">
-                    Password is required
-                </div>
-            </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" formControlName="password" placeholder="Enter password" />
         </div>
 
-        <div>
-            <input type="submit" value="Login" [disabled]="itemForm.invalid">
-        </div>
+        <button type="submit" class="btn primary-btn">Login</button>
+      </form>
 
-        <p>Don't have an account? <a>Registration</a></p>
-
-
-    </form>
+      <p class="switch-link">
+        Don’t have an account?
+        <span routerLink="/registration">Sign up</span>
+      </p>
+    </div>
+  </div>
 </div>

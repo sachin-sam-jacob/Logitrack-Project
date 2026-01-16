@@ -25,9 +25,10 @@ export class AuthService {
   {
     return localStorage.getItem('role');
   }
-  SetUsername(username:any){
+  setUsername(username:any){
     localStorage.setItem('username',username)
   }
+
 
   get getUsername ():string|null{
     return localStorage.getItem('username');
@@ -38,7 +39,7 @@ export class AuthService {
   }
   get getId ():string|null
   {
-    return localStorage.getItem('id');
+    return localStorage.getItem('user_id');
   }
   
   get getLoginStatus(): boolean {

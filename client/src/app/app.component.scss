@@ -1,0 +1,84 @@
+.login:hover {
+  background: linear-gradient(135deg, rgba(4, 0, 255, 1) 0%, rgba(136, 0, 255, 1) 35%, rgba(209, 0, 255, 1) 100%);
+  color: black;
+}
+
+.register:hover {
+  background: linear-gradient(132.6deg, rgba(71, 139, 214, 1) 23.3%, rgba(37, 216, 211, 1) 84.7%);
+}
+
+.navcol {
+  background-image: linear-gradient(105.3deg, rgba(30, 39, 107, 1) 21.8%, rgba(77, 118, 221, 1) 100.2%);
+}
+
+.logoutbtn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition-duration: .3s;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.199);
+  background-color: rgb(255, 65, 65);
+}
+
+/* plus sign */
+.sign {
+  width: 150px;
+  transition-duration: .3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sign svg {
+  width: 17px;
+}
+
+.sign svg path {
+  fill: white;
+
+}
+
+/* text */
+.text {
+  position: absolute;
+  right: 0%;
+  width: 0%;
+  opacity: 0;
+  color: white;
+  font-size: 0.7em;
+  font-weight: 300;
+  transition-duration: .3s;
+}
+
+/* hover effect on button width */
+.logoutbtn:hover {
+  width: 125px;
+  border-radius: 40px;
+  transition-duration: .3s;
+}
+
+.logoutbtn:hover .sign {
+  width: 40px;
+  transition-duration: .3s;
+  padding-left: 20px;
+}
+
+/* hover effect button's text */
+.logoutbtn:hover .text {
+  opacity: 1;
+  width: 70%;
+  transition-duration: .3s;
+  padding-right: 10px;
+}
+
+/* button click effect*/
+.logoutbtn:active {
+  transform: translate(2px, 2px);
+}

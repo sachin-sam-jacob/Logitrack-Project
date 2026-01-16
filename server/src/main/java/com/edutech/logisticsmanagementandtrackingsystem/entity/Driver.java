@@ -17,7 +17,6 @@ public class Driver {
 
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     @JsonIgnore
-
     private List<Cargo> assignedCargos;
  
 

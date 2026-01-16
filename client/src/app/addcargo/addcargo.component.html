@@ -1,1 +1,95 @@
-//doto: Complete missing code..
+<div class="page-container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>Add Cargo</h2>
+    <p>Manage cargo details and assign drivers</p>
+  </div>
+
+  <!-- ADD CARGO -->
+  <div class="card">
+    <h3>New Cargo</h3>
+
+    <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="form-grid">
+
+      <div class="form-group">
+        <label>Cargo Content</label>
+        <input type="text" formControlName="content" placeholder="Electronics" />
+        <small *ngIf="itemForm.get('content')?.touched && itemForm.get('content')?.invalid">
+          Required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Size</label>
+        <input type="text" formControlName="size" placeholder="Small / Medium / Large" />
+        <small *ngIf="itemForm.get('size')?.touched && itemForm.get('size')?.invalid">
+          Required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Status</label>
+        <select formControlName="status">
+          <option value="">Select status</option>
+          <option value="CREATED">Created</option>
+          <!-- <option value="IN_TRANSIT">In Transit</option>
+          <option value="DELIVERED">Delivered</option> -->
+        </select>
+        <small *ngIf="itemForm.get('status')?.touched && itemForm.get('status')?.invalid">
+          Required
+        </small>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="itemForm.invalid">Add Cargo</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ASSIGN DRIVER -->
+  <div class="card">
+    <h3>Assign Driver</h3>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Select Cargo</label>
+        <select (change)="selectCargo($event)">
+          <option value="">Select cargo</option>
+          <option *ngFor="let c of cargList" [value]="c.id">
+            {{ c.content }} ({{ c.status }})
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Select Driver</label>
+        <select (change)="selectDriver($event)">
+          <option value="">Select driver</option>
+          <option *ngFor="let d of driverList" [value]="d.id">
+            {{ d.name }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button
+          (click)="assignDriver()"
+          [disabled]="!assignModel.cargoId || !assignModel.driverId">
+          Assign Driver
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div *ngIf="showMessage" class="alert success">
+    {{ responseMessage }}
+  </div>
+
+  <div *ngIf="showError" class="alert error">
+    {{ errorMessage }}
+  </div>
+
+</div>

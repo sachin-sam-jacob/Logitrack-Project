@@ -54,6 +54,7 @@ public class RegisterAndLoginController {
         if (registeredUser == null) {
             return new ResponseEntity<HttpStatus>(HttpStatus.BAD_REQUEST);
         } else {
+            System.out.println("Role: "+registeredUser.getRole());
             if (registeredUser.getRole().equals("BUSINESS")) {
                 Business business = new Business();
                 business.setName(registeredUser.getUsername());

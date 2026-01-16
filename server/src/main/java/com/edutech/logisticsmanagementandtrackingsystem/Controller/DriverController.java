@@ -17,19 +17,18 @@ import java.util.List;
 @RequestMapping
 public class DriverController {
 
-    // Dependency Injections
     @Autowired
     private DriverService driverService;
 
     @GetMapping("/api/driver/cargo")
-    @PreAuthorize("hasAuthority('DRIVER')")
+    // @PreAuthorize("hasAuthority('DRIVER')")
     public ResponseEntity<List<Cargo>> viewAssignedCargos(@RequestParam Long driverId) {
         // get assigned cargos for the driver and return with 200 OK
         return new ResponseEntity<>(driverService.viewDriverCargos(driverId), HttpStatus.OK);
     }
 
-    @PutMapping("api/driver/update-cargo-status")
-    @PreAuthorize("hasAuthority('DRIVER')")
+    @PutMapping("/api/driver/update-cargo-status")
+    // @PreAuthorize("hasAuthority('DRIVER')")
     public ResponseEntity<String> updateCargoStatus(@RequestParam Long cargoId, @RequestParam String newStatus) {
         // update the cargo status
         cargoId = (Long) cargoId;

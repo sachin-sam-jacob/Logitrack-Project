@@ -1,28 +1,31 @@
 package com.edutech.logisticsmanagementandtrackingsystem.dto;
+
 public class CargoStatusResponse {
 
-    private Long cargoId;
+    private Long id;
+    private String content;
+    private String size;
     private String status;
-    
-    public CargoStatusResponse(Long cargoId, String status) {
-        this.cargoId = cargoId;
+    private String driverName;
+
+    public CargoStatusResponse(
+            Long id,
+            String content,
+            String size,
+            String status,
+            String driverName
+    ) {
+        this.id = id;
+        this.content = content;
+        this.size = size;
         this.status = status;
+        this.driverName = driverName;
     }
- 
-    public Long getCargoId() {
-        return cargoId;
-    }
- 
-    public void setCargoId(Long cargoId) {
-        this.cargoId = cargoId;
-    }
- 
-    public String getStatus() {
-        return status;
-    }
- 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+
+    public Long getId() { return id; }
+    public String getContent() { return content; }
+    public String getSize() { return size; }
+    public String getStatus() { return status; }
+    public String getDriverName() { return driverName; }
 }
- 
+

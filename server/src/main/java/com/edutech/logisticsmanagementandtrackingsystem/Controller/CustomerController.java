@@ -22,7 +22,7 @@ public class CustomerController {
     private CustomerService customerService;
 
     @GetMapping("/cargo-status")
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+    // @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<CargoStatusResponse> viewCargoStatus(@RequestParam Long cargoId) {
 
         // get cargo status from customer service and return it with status code 200
