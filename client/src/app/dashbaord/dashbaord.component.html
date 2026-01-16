@@ -1,82 +1,79 @@
-<div class="layout">
+<div class="app-shell">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="modern-sidebar">
 
-    <!-- LOGO -->
-    <div class="logo">
-      <span class="logo-icon">🚚</span>
-      <span class="logo-text">LogiTrack</span>
+    <!-- BRAND -->
+    <div class="brand">
+      <div class="brand-icon">🚚</div>
+      <span class="brand-text">LogiTrack</span>
     </div>
 
-    <!-- PROFILE -->
-    <div class="profile">
-      <div class="avatar">{{ username?.charAt(0) | uppercase }}</div>
-      <div class="profile-info">
-        <p class="name">{{ username }}</p>
-        <span class="role">{{ roleName }}</span>
+    <!-- USER CARD -->
+    <div class="user-card">
+      <div class="user-avatar">
+        {{ username?.charAt(0) | uppercase }}
+      </div>
+      <div class="user-details">
+        <h4>{{ username }}</h4>
+        <span>{{ roleName }}</span>
       </div>
     </div>
 
-    <!-- NAVIGATION -->
-    <nav class="nav">
+    <!-- MENU -->
+    <nav class="menu">
 
-      <!-- ================= BUSINESS ================= -->
+      <!-- BUSINESS -->
       <ng-container *ngIf="roleName === 'BUSINESS'">
         <a routerLink="/dashboard/add-cargo" routerLinkActive="active">
-          ➕ Add Cargo
+          <span>➕</span>
+          <p>Add Cargo</p>
         </a>
 
-        <!-- <a routerLink="/dashboard/assign-cargo" routerLinkActive="active">
-          👤 Assign Cargo
-        </a> -->
-
         <a routerLink="/dashboard/view-business-cargo" routerLinkActive="active">
-          📦 View Cargos
+          <span>📦</span>
+          <p>View Cargos</p>
         </a>
 
         <a routerLink="/dashboard/drivers" routerLinkActive="active">
-          🚚 Drivers
+          <span>🚚</span>
+          <p>Drivers</p>
         </a>
       </ng-container>
 
-      <!-- ================= DRIVER ================= -->
+      <!-- DRIVER -->
       <ng-container *ngIf="roleName === 'DRIVER'">
         <a routerLink="/dashboard/assign-cargo" routerLinkActive="active">
-          📦 My Assigned Cargos
+          <span>📦</span>
+          <p>My Cargos</p>
         </a>
 
         <a routerLink="/dashboard/update-status" routerLinkActive="active">
-          🔄 Update Cargo Status
+          <span>🔄</span>
+          <p>Update Status</p>
         </a>
       </ng-container>
 
-      <!-- ================= CUSTOMER ================= -->
+      <!-- CUSTOMER -->
       <ng-container *ngIf="roleName === 'CUSTOMER'">
         <a routerLink="/dashboard/view-cargo" routerLinkActive="active">
-          🔍 Track Cargo
+          <span>🔍</span>
+          <p>Track Cargo</p>
         </a>
       </ng-container>
 
     </nav>
 
     <!-- LOGOUT -->
-    <button class="logout" (click)="logout()">
+    <button class="logout-btn" (click)="logout()">
       🚪 Logout
     </button>
 
   </aside>
 
-  <!-- MAIN CONTENT -->
-  <main class="content">
-
-    <header class="header">
-      <h1>Welcome, <span>{{ username }}</span></h1>
-    </header>
-
-    <!-- CHILD ROUTES LOAD HERE -->
+  <!-- CONTENT -->
+  <main class="main-area">
     <router-outlet></router-outlet>
-
   </main>
 
 </div>
