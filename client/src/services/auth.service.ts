@@ -39,7 +39,7 @@ export class AuthService {
   }
   get getId ():string|null
   {
-    return localStorage.getItem('user_id');
+    return localStorage.getItem('id');
   }
   
   get getLoginStatus(): boolean {
