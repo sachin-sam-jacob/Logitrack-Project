@@ -25,7 +25,7 @@
               (itemForm.get('username')?.dirty || itemForm.get('username')?.touched)
             ">
               <span *ngIf="itemForm.get('username')?.errors?.['required']">* Username is required *</span>
-              <span *ngIf="itemForm.get('username')?.errors?.['minlength']">* Minimum 8 characters required *</span>
+              <span *ngIf="itemForm.get('username')?.errors?.['minlength']">* Minimum 6 characters required *</span>
             </small>
           </div>
 
@@ -42,22 +42,67 @@
             </small>
           </div>
 
-          <!-- Password -->
-          <div class="input-group">
-            <label>Password</label>
-            <input type="password" formControlName="password" placeholder="Create a strong password" />
-            <small class="error" *ngIf="
-              itemForm.get('password')?.invalid &&
-              (itemForm.get('password')?.dirty || itemForm.get('password')?.touched)
-            ">
-              <span *ngIf="itemForm.get('password')?.errors?.['required']">* Password is required *</span>
-              <span *ngIf="itemForm.get('password')?.errors?.['invalidMinLength']">* Minimum 8 characters required *</span>
-              <span *ngIf="itemForm.get('password')?.errors?.['missingLowerCase']">* At least one lowercase letter *</span>
-              <span *ngIf="itemForm.get('password')?.errors?.['missingUpperCase']">* At least one uppercase letter *</span>
-              <span *ngIf="itemForm.get('password')?.errors?.['missingDigit']">* At least one digit *</span>
-              <span *ngIf="itemForm.get('password')?.errors?.['missingSpecial']">* At least one special character *</span>
-            </small>
-          </div>
+
+
+<div class="input-group password-group">
+  <label>Password</label>
+  <div class="password-wrapper">
+    <input
+      [type]="showPassword ? 'text' : 'password'"
+      formControlName="password"
+      placeholder="Create a strong password"
+      (focus)="showChecklist = true"
+      (blur)="hideChecklist()"
+    />
+    <!-- Eye Icon -->
+    <span class="toggle-eye" (click)="togglePasswordVisibility()">
+      <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+    </span>
+  </div>
+
+  <!-- Live validation checklist -->
+  <div class="password-checklist" *ngIf="showChecklist && !allValid">
+    <p [class.valid]="hasMinLength">
+      <span>{{ hasMinLength ? '✅' : '❌' }}</span> Minimum 8 characters
+    </p>
+    <p [class.valid]="hasLowerCase">
+      <span>{{ hasLowerCase ? '✅' : '❌' }}</span> At least one lowercase letter
+    </p>
+    <p [class.valid]="hasUpperCase">
+      <span>{{ hasUpperCase ? '✅' : '❌' }}</span> At least one uppercase letter
+    </p>
+    <p [class.valid]="hasDigit">
+      <span>{{ hasDigit ? '✅' : '❌' }}</span> At least one digit
+    </p>
+    <p [class.valid]="hasSpecialChar">
+      <span>{{ hasSpecialChar ? '✅' : '❌' }}</span> At least one special character
+    </p>
+  </div>
+</div>
+
+
+<!-- CONFIRM PASSWORD -->
+<div class="input-group password-group">
+  <label>Confirm Password</label>
+
+  <div class="password-wrapper">
+    <input
+      [type]="showConfirmPassword ? 'text' : 'password'"
+      formControlName="confirmPassword"
+      placeholder="Re-enter your password"
+    />
+    <span class="toggle-eye" (click)="toggleConfirmPasswordVisibility()">
+      <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+    </span>
+  </div>
+
+  <small class="error" *ngIf="
+    itemForm.hasError('passwordMismatch') &&
+    itemForm.get('confirmPassword')?.touched
+  ">
+    Passwords do not match
+  </small>
+</div>
 
           <!-- Role -->
           <div class="input-group">

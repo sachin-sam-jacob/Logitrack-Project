@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { HttpService } from '../../services/http.service';
@@ -16,7 +16,12 @@ export class RegistrationComponent implements OnInit {
   itemForm!: FormGroup;
   formModel: any = { role: '', email: '', password: '', username: '' };
   roles: string[] = ['Choose Role', 'BUSINESS', 'DRIVER', 'CUSTOMER'];
-
+  hasMinLength = false;
+hasLowerCase = false;
+hasUpperCase = false;
+hasDigit = false;
+hasSpecialChar = false;
+allValid = false;
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -26,12 +31,23 @@ export class RegistrationComponent implements OnInit {
 
   ngOnInit(): void {
     this.itemForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      username: ['', [Validators.required, Validators.minLength(6)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required]],
+      confirmPassword: ['', Validators.required],
       role: ['Choose Role', [Validators.required, this.validateRole]]
-    });
-  }
+    },{validators:this.passwordMatchValidator});
+
+  this.itemForm.get('password')?.valueChanges.subscribe(value => {
+    this.hasMinLength = value.length >= 8;
+    this.hasLowerCase = /[a-z]/.test(value);
+    this.hasUpperCase = /[A-Z]/.test(value);
+    this.hasDigit = /\d/.test(value);
+    this.hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
+
+    this.allValid = this.hasMinLength && this.hasLowerCase && this.hasUpperCase && this.hasDigit && this.hasSpecialChar;
+  });
+}
 
   validateRole(control: any) {
     return control.value === 'Choose Role' ? { invalidRole: true } : null;
@@ -75,4 +91,31 @@ export class RegistrationComponent implements OnInit {
       }
     );
   }
+
+showConfirmPassword = false;
+
+toggleConfirmPasswordVisibility() {
+  this.showConfirmPassword = !this.showConfirmPassword;
+}
+
+passwordMatchValidator(form: AbstractControl): ValidationErrors | null {
+  const password = form.get('password')?.value;
+  const confirmPassword = form.get('confirmPassword')?.value;
+  return password === confirmPassword ? null : { passwordMismatch: true };
+}
+
+showPassword = false;
+showChecklist = false;
+
+togglePasswordVisibility() {
+  this.showPassword = !this.showPassword;
+}
+
+hideChecklist() {
+  // Hide checklist only if all conditions are met
+  if (this.allValid) {
+    this.showChecklist = false;
+  }
+}
+
 }

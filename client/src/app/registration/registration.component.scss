@@ -182,3 +182,46 @@
   color:#721c24;
   border-left-color: #dc3545;
 }
+
+
+.password-checklist p {
+  font-size: 14px;
+  margin: 6px 0;
+  color: red; /* Default color for ❌ */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-checklist p.valid {
+  color: green; /* ✅ turns green when valid */
+  font-weight: bold;
+}
+
+.password-checklist span {
+  font-size: 8px;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 40px; /* space for eye icon */
+}
+
+.toggle-eye {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  font-size: 18px;
+  color: #555;
+}
+
+.toggle-eye:hover {
+  color: #2a5298; /* hover color */
+}
+
