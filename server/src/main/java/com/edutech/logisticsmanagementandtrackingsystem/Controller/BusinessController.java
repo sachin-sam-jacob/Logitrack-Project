@@ -36,12 +36,12 @@ public class BusinessController {
         return new ResponseEntity<>(savedCargo, HttpStatus.CREATED);
     }
 
-    // @GetMapping("/cargo")
-    // public ResponseEntity<List<Cargo>> viewBusinessCargo(Principal principal) {
-    //     return ResponseEntity.ok(
-    //         cargoService.getCargoByBusiness(principal.getName())
-    //     );
-    // }
+    @GetMapping("/cargo")
+    public ResponseEntity<List<Cargo>> viewBusinessCargo(Authentication auth) {
+        return ResponseEntity.ok(
+            cargoService.getCargoByBusiness(auth.getName())
+        );
+    }
 
     @GetMapping("/drivers")
     public ResponseEntity<List<Driver>> getAllDrivers() {
