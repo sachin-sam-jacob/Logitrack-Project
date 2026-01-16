@@ -120,9 +120,34 @@
           </div>
 
           <!-- Submit Button -->
-          <div class="input-group">
-            <button type="submit" [disabled]="itemForm.invalid" class="btn primary-btn">Register</button>
-          </div>
+      <div class="input-group">  
+        <button 
+          type="submit" 
+          [disabled]="itemForm.invalid || isSubmitting || otpSent" 
+          class="btn primary-btn">
+          {{ isSubmitting ? 'Registering...' : 'Register' }}
+        </button>  
+      </div>
+
+
+        <div *ngIf="otpSent" class="input-group">
+          <label>Enter OTP</label>
+          <input type="text" formControlName="otp" placeholder="6-digit OTP" />
+        </div>
+
+        <div *ngIf="otpSent" class="input-group">
+          <button type="button"  [disabled]="!itemForm.value.otp"  class="btn primary-btn" (click)="verifyOtp()">
+              Verify OTP
+          </button>
+        </div>
+        <div *ngIf="otpSent" class="resend-container">
+        <button
+          class="btn link-btn"
+          [disabled]="resendDisabled"
+          (click)="resendOtp()">
+          {{ resendDisabled ? 'Resend OTP in ' + countdown + 's' : 'Resend OTP' }}
+        </button>
+      </div>
 
         </form>
       </div>

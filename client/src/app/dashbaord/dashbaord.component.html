@@ -73,7 +73,18 @@
 
   <!-- CONTENT -->
   <main class="main-area">
+
+    <!-- WELCOME CARD -->
+    <header class="header">
+      <h1>Welcome back,<span>{{ username }}</span>  👋</h1>
+      <p>
+        You are logged in as
+        <span class="role">{{ roleName }}</span>
+      </p>
+      </header>
+    <!-- CHILD ROUTES -->
     <router-outlet></router-outlet>
+
   </main>
 
 </div>

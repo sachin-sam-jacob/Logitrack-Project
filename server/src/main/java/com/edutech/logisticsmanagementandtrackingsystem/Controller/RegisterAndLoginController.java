@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.edutech.logisticsmanagementandtrackingsystem.dto.LoginRequest;
 import com.edutech.logisticsmanagementandtrackingsystem.dto.LoginResponse;
+import com.edutech.logisticsmanagementandtrackingsystem.dto.OtpRequest;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Business;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Customer;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Driver;
@@ -24,77 +25,147 @@ import com.edutech.logisticsmanagementandtrackingsystem.jwt.JwtUtil;
 import com.edutech.logisticsmanagementandtrackingsystem.service.BusinessService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.CustomerService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.DriverService;
+import com.edutech.logisticsmanagementandtrackingsystem.service.OtpService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.UserService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class RegisterAndLoginController {
 
-    @Autowired
-    private UserService userService;
+    @Autowired  
+    private UserService userService;  
 
-    @Autowired
-    private BusinessService businessService;
+    @Autowired  
+    private OtpService otpService;  
 
-    @Autowired
-    private CustomerService customerService;
+    @Autowired  
+    private BusinessService businessService;  
 
-    @Autowired
-    private DriverService driverService;
+    @Autowired  
+    private CustomerService customerService;  
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    @Autowired  
+    private DriverService driverService;  
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    @Autowired  
+    private AuthenticationManager authenticationManager;  
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
-        if (registeredUser == null) {
-            return new ResponseEntity<HttpStatus>(HttpStatus.BAD_REQUEST);
-        } else {
-            System.out.println("Role: "+registeredUser.getRole());
-            if (registeredUser.getRole().equals("BUSINESS")) {
-                Business business = new Business();
-                business.setName(registeredUser.getUsername());
-                business.setEmail(user.getEmail());
-                businessService.registerBusiness(business);
-                return ResponseEntity.ok(business);
-            } else if (registeredUser.getRole().equals("CUSTOMER")) {
-                Customer customer = new Customer();
-                customer.setName(registeredUser.getUsername());
-                customer.setEmail(user.getEmail());
-                return ResponseEntity.ok(customerService.createCustomer(customer));
-            } else {
-                Driver driver = new Driver();
-                driver.setName(registeredUser.getUsername());
-                driver.setEmail(user.getEmail());
-                return ResponseEntity.ok(driverService.createDriver(driver));
-            }
-        }
-    }
+    @Autowired  
+    private JwtUtil jwtUtil;  
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
+    // REGISTER - FIXED
+    @PostMapping("/register")  
+    public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {  
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        } catch (AuthenticationException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password", e);
+            User registeredUser = userService.registerUser(user);  
+            if (registeredUser == null) {  
+                Map<String, String> error = new HashMap<>();  
+                error.put("message", "User already exists");  
+                return ResponseEntity.badRequest().body(error);  
+            }  
+
+            otpService.generateAndSendOtp(registeredUser);  
+            Map<String, String> success = new HashMap<>();  
+            success.put("message", "OTP sent to email");  
+            return ResponseEntity.ok(success);  
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();  
+            error.put("message", "Registration failed: " + e.getMessage());  
+            return ResponseEntity.internalServerError().body(error);
         }
+    }  
 
-        final UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
-        final String token = jwtUtil.generateToken(userDetails.getUsername());
+    // VERIFY OTP  
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Map<String, String>> verifyOtp(@RequestBody OtpRequest request) {
+        try {
+            User user = userService.getUserByUsername(request.getUsername());  
+            if (!otpService.validateOtp(user, request.getOtp())) {  
+                Map<String, String> error = new HashMap<>();  
+                error.put("message", "Invalid or expired OTP");  
+                return ResponseEntity.badRequest().body(error);  
+            }  
 
-        User user = userService.getUserByUsername(loginRequest.getUsername());
-        // if(user.getRole() == "DRIVER"){
-        // Driver driver = driverService.getDriver(loginRequest.getUsername());
-        // user.setId(driver.getId());
-        // }
+            user.setEnabled(true);  
+            user.setEmailVerified(true);  
+            userService.updateUser(user);  
 
-        return ResponseEntity
-                .ok(new LoginResponse(token, user.getUsername(), user.getEmail(), user.getRole(), user.getId()));
+            // Create role-based entity ONLY ONCE  
+            if (user.getRole().equals("BUSINESS")) {  
+                Business business = new Business();  
+                business.setName(user.getUsername());  
+                business.setEmail(user.getEmail());  
+                businessService.registerBusiness(business);  
+            } else if (user.getRole().equals("CUSTOMER")) {  
+                Customer customer = new Customer();  
+                customer.setName(user.getUsername());  
+                customer.setEmail(user.getEmail());  
+                customerService.createCustomer(customer);  
+            } else {  
+                Driver driver = new Driver();  
+                driver.setName(user.getUsername());  
+                driver.setEmail(user.getEmail());  
+                driverService.createDriver(driver);  
+            }  
+
+            Map<String, String> success = new HashMap<>();  
+            success.put("message", "Email verified successfully");  
+            return ResponseEntity.ok(success);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();  
+            error.put("message", "Verification failed: " + e.getMessage());  
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
+    // LOGIN 
+    @PostMapping("/login")  
+    public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {  
+        User user = userService.getUserByUsername(loginRequest.getUsername());  
+        if (!user.isEnabled()) {  
+            throw new ResponseStatusException(  
+                HttpStatus.FORBIDDEN,  
+                "Please verify your email first"  
+            );  
+        }  
+        authenticationManager.authenticate(  
+            new UsernamePasswordAuthenticationToken(  
+                loginRequest.getUsername(),  
+                loginRequest.getPassword()  
+            )  
+        );  
+        final UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());  
+        final String token = jwtUtil.generateToken(userDetails.getUsername());  
+        return ResponseEntity.ok(  
+            new LoginResponse(  
+                token,  
+                user.getUsername(),  
+                user.getEmail(),  
+                user.getRole(),  
+                user.getId()  
+            )  
+        );  
+    }
+
+    //RESEND OTP
+    @PostMapping("/resend-otp")
+    public ResponseEntity<Map<String, String>> resendOtp(@RequestBody Map<String, String> request) {
+
+        String username = request.get("username");
+        User user = userService.getUserByUsername(username);
+
+        if (user.isEnabled()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "User already verified"));
+        }
+
+        otpService.generateAndSendOtp(user);
+
+        return ResponseEntity.ok(
+                Map.of("message", "OTP resent successfully")
+        );
+    }
 }

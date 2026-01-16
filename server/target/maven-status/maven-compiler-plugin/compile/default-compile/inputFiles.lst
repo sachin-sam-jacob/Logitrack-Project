@@ -9,6 +9,7 @@
 /home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/Controller/BusinessController.java
 /home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/dto/CargoStatusResponse.java
 /home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/entity/EmailOtp.java
+/home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/dto/OtpRequest.java
 /home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/repository/UserRepository.java
 /home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/jwt/JwtRequestFilter.java
 /home/coder/app/server/src/main/java/com/edutech/logisticsmanagementandtrackingsystem/repository/EmailOtpRepository.java

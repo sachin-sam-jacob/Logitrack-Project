@@ -1,6 +1,8 @@
 package com.edutech.logisticsmanagementandtrackingsystem.service;
  
  
+import java.util.Optional;
+
 import javax.persistence.EntityNotFoundException;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.CustomerRepos
  
 @Service
 public class CustomerService {
-    // Dependency Injections
+    
     @Autowired
     private CustomerRepository customerRepository;
  
@@ -23,7 +25,6 @@ public class CustomerService {
     private CargoRepository cargoRepository;
  
     public Customer createCustomer(Customer customer) {
-        // save the customer to the database
         return customerRepository.save(customer);
  
     }
@@ -45,4 +46,6 @@ public class CustomerService {
                 driverName
         );
     }
+
+   
 }

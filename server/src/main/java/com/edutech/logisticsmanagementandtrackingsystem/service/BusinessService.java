@@ -17,12 +17,11 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.DriverReposit
  
 @Service
 public class BusinessService {
-    //Dependency Injection
     @Autowired
     private BusinessRepository businessRepository;
  
     public Business registerBusiness(Business business) {
-        // save business to database
         return this.businessRepository.save(business);
     }
+
 }

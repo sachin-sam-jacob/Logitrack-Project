@@ -16,6 +16,28 @@ public class User {
     @Column(name="email") // Role can be 'BUSINESS', 'DRIVER', 'CUSTOMER'
     private String email;
 
+    @Column(nullable = false)
+    private boolean enabled=false;
+
+    @Column(nullable = false)
+    private boolean emailVerified=false;
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
     public Long getId() {
         return id;
     }

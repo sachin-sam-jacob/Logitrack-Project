@@ -26,66 +26,63 @@ import java.util.List;
  
 @Service
 public class UserService implements UserDetailsService {
- 
-    // Dependency Injections
 
     @Autowired
-
     private UserRepository userRepository;
- 
-    @Autowired
 
+    @Autowired
     private PasswordEncoder passwordEncoder;
- 
-    // If username already present in DB then it will return null or Else save in DB
 
     public User registerUser(User user) {
 
-        User user1 = userRepository.findByUsername(user.getUsername());
+        User existingUser = userRepository.findByUsername(user.getUsername());
 
-        if (user1 == null) {
-
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-
-            return userRepository.save(user);
-
-        } else {
-
-            return null;
-
+        if (existingUser != null) {
+            return null; 
         }
 
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setEnabled(false);        
+        user.setEmailVerified(false);  
+
+        return userRepository.save(user);
     }
- 
-    // Getting User by taking username
+
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
 
     public User getUserByUsername(String username) {
-
-        return userRepository.findByUsername(username);
-
-    }
- 
-    @Override
-
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
+        return user;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username)
+            throws UsernameNotFoundException {
+
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
             throw new UsernameNotFoundException("User not found");
+        }
 
+        if (!user.isEnabled()) {
+            throw new UsernameNotFoundException(
+                "Email not verified. Please verify OTP."
+            );
         }
 
         return new org.springframework.security.core.userdetails.User(
-
                 user.getUsername(),
-
                 user.getPassword(),
-
-                AuthorityUtils.createAuthorityList(user.getRole()));
-
+                AuthorityUtils.createAuthorityList(user.getRole())
+        );
     }
-
 }
- 

@@ -47,6 +47,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/register").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/resend-otp").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/verify-otp").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/business/cargo").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/drivers").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/cargo").hasAuthority("BUSINESS")
