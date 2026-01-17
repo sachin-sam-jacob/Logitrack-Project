@@ -31,7 +31,8 @@ export class AssginCargoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.driverId = Number(this.authService.getId); // Logged-in DRIVER id
+    this.driverId = Number(this.authService.getId); // Logged-in DRIVER id\
+    //console.log("Driver id received",this.driverId)
     this.getAssignedCargo();
   }
 
