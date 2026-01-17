@@ -13,10 +13,7 @@
       placeholder="Enter Cargo ID"
       [(ngModel)]="cargoIdMd"
     />
-
-    <button (click)="search()">
-      🔍 Track
-    </button>
+    <button (click)="search()">🔍 Track</button>
   </div>
 
   <!-- ERROR MESSAGE -->
@@ -26,7 +23,6 @@
 
   <!-- CARGO STATUS CARD -->
   <div class="cargo-card" *ngIf="cargo?.id">
-
     <div class="card-header">
       <h3>Cargo Details</h3>
       <span class="status-badge" [ngClass]="cargo.status?.toLowerCase()">
@@ -39,17 +35,14 @@
         <label>Cargo ID</label>
         <p>{{ cargo.id }}</p>
       </div>
-
       <div>
         <label>Content</label>
         <p>{{ cargo.content }}</p>
       </div>
-
       <div>
         <label>Size</label>
         <p>{{ cargo.size }}</p>
       </div>
-
       <div>
         <label>Assigned Driver</label>
         <p>{{ cargo.driverName || 'Not Assigned' }}</p>
@@ -59,10 +52,25 @@
     <!-- STATUS TIMELINE -->
     <div class="timeline">
       <div class="step completed">Created</div>
-      <div class="step" [class.completed]="cargo.status !== 'CREATED'">In Transit</div>
-      <div class="step" [class.completed]="cargo.status === 'DELIVERED'">Delivered</div>
+      <div
+        class="step"
+        [ngClass]="{
+          completed: cargo.status === 'IN_TRANSIT' || cargo.status === 'DELIVERED',
+          current: cargo.status === 'IN_TRANSIT'
+        }"
+      >
+        In Transit
+      </div>
+      <div
+        class="step"
+        [ngClass]="{
+          completed: cargo.status === 'DELIVERED',
+          current: cargo.status === 'DELIVERED'
+        }"
+      >
+        Delivered
+      </div>
     </div>
-
   </div>
 
 </div>
