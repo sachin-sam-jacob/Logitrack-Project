@@ -224,4 +224,93 @@
 .toggle-eye:hover {
   color: #2a5298; /* hover color */
 }
+/* ============================= */
+/* PASSWORD STRENGTH (MODERN)   */
+/* ============================= */
+
+.strength-wrapper {
+  margin-top: 10px;
+}
+
+.strength-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.strength-label {
+  font-weight: 600;
+}
+
+/* Bar container */
+.strength-bar {
+  height: 8px;
+  width: 100%;
+  background: #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Animated fill */
+.strength-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+/* ============================= */
+/* COLOR GRADING (ENTERPRISE)   */
+/* ============================= */
+
+.strength-weak {
+  color: #dc2626;
+}
+
+
+
+/* Medium */
+.strength-medium {
+  color: #d97706;
+}
+
+
+
+/* Strong */
+.strength-strong {
+  color: #2563eb;
+}
+
+
+
+/* Very Strong (Premium) */
+.strength-very-strong {
+  color: #16a34a;
+}
+
+
+
+/* Weak */
+.strength-fill.strength-weak {
+  background: linear-gradient(90deg, #dc2626, #f87171);
+}
+
+/* Medium */
+.strength-fill.strength-medium {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+/* Strong */
+.strength-fill.strength-strong {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+/* Very Strong */
+.strength-fill.strength-very-strong {
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.45);
+}
+
 

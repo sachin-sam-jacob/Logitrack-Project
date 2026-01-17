@@ -59,6 +59,24 @@
       <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
     </span>
   </div>
+  <!-- Password Strength Meter -->
+<div class="strength-wrapper" *ngIf="passwordValue">
+  <div class="strength-header">
+    <span>Password strength</span>
+    <span class="strength-label" [ngClass]="strengthClass">
+      {{ strengthLabel }}
+    </span>
+  </div>
+
+  <div class="strength-bar">
+    <div
+      class="strength-fill"
+      [ngClass]="strengthClass"
+      [style.width.%]="strengthPercent">
+    </div>
+  </div>
+</div>
+
 
   <!-- Live validation checklist -->
   <div class="password-checklist" *ngIf="showChecklist && !allValid">
