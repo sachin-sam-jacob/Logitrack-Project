@@ -26,6 +26,7 @@ export class RegistrationComponent implements OnInit {
   // OTP
   otpSent = false;
   registeredUsername = '';
+  registeredRole = ''; // NEW: Store role
 
   // Password rule flags
   hasMinLength = false;
@@ -40,7 +41,7 @@ export class RegistrationComponent implements OnInit {
   showConfirmPassword = false;
   showChecklist = false;
 
-  // 🔥 Password strength meter
+  // Password strength meter
   passwordValue = '';
   strengthPercent = 0;
   strengthLabel = '';
@@ -67,7 +68,7 @@ export class RegistrationComponent implements OnInit {
       otp: ['']
     }, { validators: this.passwordMatchValidator });
 
-    // 🔴 Live password validation + strength
+    // Live password validation + strength
     this.itemForm.get('password')?.valueChanges.subscribe(value => {
       const password = value || '';
       this.passwordValue = password;
@@ -93,7 +94,7 @@ export class RegistrationComponent implements OnInit {
     });
   }
 
-  // ---------------- PASSWORD ----------------
+  // Password methods
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
@@ -114,7 +115,6 @@ export class RegistrationComponent implements OnInit {
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  // 🔥 Password strength calculation
   calculateStrength() {
     let score = 0;
 
@@ -153,7 +153,7 @@ export class RegistrationComponent implements OnInit {
     }
   }
 
-  // ---------------- REGISTER ----------------
+  // REGISTER
   onRegister(): void {
     if (this.itemForm.invalid || this.isSubmitting) {
       this.itemForm.markAllAsTouched();
@@ -179,6 +179,7 @@ export class RegistrationComponent implements OnInit {
         );
         this.otpSent = true;
         this.registeredUsername = payload.username;
+        this.registeredRole = payload.role; // Store role
         this.startResendTimer();
         this.isSubmitting = false;
       },
@@ -193,7 +194,7 @@ export class RegistrationComponent implements OnInit {
     });
   }
 
-  // ---------------- VERIFY OTP ----------------
+  // VERIFY OTP - MODIFIED
   verifyOtp(): void {
     const otp = this.itemForm.value.otp?.trim();
 
@@ -209,12 +210,16 @@ export class RegistrationComponent implements OnInit {
       next: () => {
         Swal.fire(
           'Email Verified!',
-          'You can now login',
+          'Please complete your profile',
           'success'
         ).then(() => {
-          this.itemForm.reset();
-          this.otpSent = false;
-          this.router.navigate(['/login']);
+          // Navigate to user details page with username and role
+          this.router.navigate(['/user-details'], {
+            queryParams: {
+              username: this.registeredUsername,
+              role: this.registeredRole
+            }
+          });
         });
       },
       error: (error) => {
@@ -227,7 +232,7 @@ export class RegistrationComponent implements OnInit {
     });
   }
 
-  // ---------------- RESEND OTP ----------------
+  // RESEND OTP
   startResendTimer() {
     this.resendDisabled = true;
     this.countdown = 30;

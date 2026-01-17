@@ -1,0 +1,149 @@
+.details-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.details-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 30px;
+
+  h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #7f8c8d;
+  }
+}
+
+.input-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2c3e50;
+
+    .required {
+      color: #e74c3c;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.3s;
+
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+  }
+}
+
+.file-upload {
+  input[type="file"] {
+    display: none;
+  }
+
+  .file-label {
+    display: block;
+    padding: 12px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #7f8c8d;
+
+    &:hover {
+      border-color: #667eea;
+      background: #f8f9fa;
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+  }
+}
+
+.secondary-btn {
+  background: transparent;
+  color: #667eea;
+  border: 2px solid #667eea;
+
+  &:hover {
+    background: #667eea;
+    color: white;
+  }
+}
+
+@media (max-width: 600px) {
+  .details-card {
+    padding: 24px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,162 @@
+.profile-container {
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+.profile-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  margin-bottom: 30px;
+
+  h2 {
+    font-size: 28px;
+    color: #2c3e50;
+    margin-bottom: 10px;
+  }
+
+  .warning-text {
+    color: #f39c12;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+
+  .success-text {
+    color: #27ae60;
+    font-weight: 500;
+    margin-top: 8px;
+  }
+}
+
+.input-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2c3e50;
+
+    .required {
+      color: #e74c3c;
+    }
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border 0.3s;
+
+    &:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .error {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 4px;
+    display: block;
+  }
+}
+
+.file-upload {
+  input[type="file"] {
+    display: none;
+  }
+
+  .file-label {
+    display: block;
+    padding: 12px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    color: #7f8c8d;
+
+    &:hover {
+      border-color: #3498db;
+      background: #f8f9fa;
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.btn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(52, 152, 219, 0.4);
+  }
+}
+
+.secondary-btn {
+  background: transparent;
+  color: #3498db;
+  border: 2px solid #3498db;
+
+  &:hover {
+    background: #3498db;
+    color: white;
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 16px;
+  }
+
+  .profile-card {
+    padding: 24px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+}

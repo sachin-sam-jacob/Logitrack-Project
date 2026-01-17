@@ -24,6 +24,42 @@ export class HttpService {
     return this.http.post(`${this.serverName}/api/login`, details, { headers: headers });
   }
 
+  verifyOtp(data: any) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+    return this.http.post(`${this.serverName}/api/verify-otp`, data, { headers: headers });
+  }
+
+  resendOtp(data: any): Observable<any> {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json');
+    return this.http.post(`${this.serverName}/api/resend-otp`, data, { headers });
+  }
+
+  // NEW: User Details Methods
+  submitBusinessDetails(details: any): Observable<any> {
+    let headers = new HttpHeaders();  
+    headers = headers.set('Content-Type', 'application/json');  
+    return this.http.post(`${this.serverName}/api/user-details/business`, details, { headers });
+  }
+
+  submitDriverDetails(details: any): Observable<any> {
+    let headers = new HttpHeaders();  
+    headers = headers.set('Content-Type', 'application/json');  
+    return this.http.post(`${this.serverName}/api/user-details/driver`, details, { headers });
+  }
+
+  submitCustomerDetails(details: any): Observable<any> {
+    let headers = new HttpHeaders();  
+    headers = headers.set('Content-Type', 'application/json');  
+    return this.http.post(`${this.serverName}/api/user-details/customer`, details, { headers });
+  }
+
+  checkDetailsCompletion(username: string, role: string): Observable<any> {
+    return this.http.get(`${this.serverName}/api/user-details/check-completion?username=${username}&role=${role}`);
+  }
+
+  // Existing methods...
   addCargo(details: any): Observable<any> {
     const authToken = this.authService.getToken();  
     let headers = new HttpHeaders();  
@@ -116,18 +152,4 @@ export class HttpService {
     headers = headers.set('Authorization', `Bearer ${authToken}`);
     return this.http.get(`${this.serverName}/api/business/search-cargo?keyword=${keyword}`, { headers: headers });
   }
-
-  verifyOtp(data: any) {
-  let headers = new HttpHeaders();
-  headers = headers.set('Content-Type', 'application/json');
-  return this.http.post(`${this.serverName}/api/verify-otp`, data, { headers: headers });
-}
-
-resendOtp(data: any): Observable<any> {
-  let headers = new HttpHeaders();
-  headers = headers.set('Content-Type', 'application/json');
-  return this.http.post(`${this.serverName}/api/resend-otp`, data, { headers });
-}
-
-
 }

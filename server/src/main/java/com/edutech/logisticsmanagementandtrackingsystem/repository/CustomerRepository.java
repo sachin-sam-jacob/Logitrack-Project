@@ -10,4 +10,5 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.Customer;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer,Long>{
+    Customer findByName(String name);
 }

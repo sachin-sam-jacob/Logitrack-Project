@@ -10,16 +10,34 @@ public class Business {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @Column(name="name")
     private String name;
+    
     @Column(name="email")
     private String email;
+    
+    // NEW FIELDS
+    @Column(name="business_name")
+    private String businessName;
+    
+    @Column(name="location")
+    private String location;
+    
+    @Column(name="contact_number")
+    private String contactNumber;
+    
+    @Column(name="business_type")
+    private String businessType; // e.g., "Retail", "Manufacturing", etc.
+    
+    @Column(name="details_completed", nullable = false)
+    private boolean detailsCompleted = false;
  
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL)
     @JsonIgnore
-
     private List<Cargo> cargos;
 
+    // Constructors
     public Business(String name, String email, List<Cargo> cargos) {
         this.name = name;
         this.email = email;
@@ -29,6 +47,7 @@ public class Business {
     public Business() {
     }
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -60,6 +79,45 @@ public class Business {
     public void setCargos(List<Cargo> cargos) {
         this.cargos = cargos;
     }
-}
 
+    public String getBusinessName() {
+        return businessName;
+    }
+
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getContactNumber() {
+        return contactNumber;
+    }
+
+    public void setContactNumber(String contactNumber) {
+        this.contactNumber = contactNumber;
+    }
+
+    public String getBusinessType() {
+        return businessType;
+    }
+
+    public void setBusinessType(String businessType) {
+        this.businessType = businessType;
+    }
+
+    public boolean isDetailsCompleted() {
+        return detailsCompleted;
+    }
+
+    public void setDetailsCompleted(boolean detailsCompleted) {
+        this.detailsCompleted = detailsCompleted;
+    }
+}
  

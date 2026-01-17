@@ -52,15 +52,8 @@ export class LoginComponent implements OnInit {
           this.authService.saveToken(data.token);
           this.authService.setUsername(data.username);
 
-          Swal.fire({
-            icon: 'success',
-            title: 'Login Successful',
-            text: `Welcome back, ${data.username}!`,
-            timer: 1500,
-            showConfirmButton: false
-          }).then(() => {
-            this.router.navigateByUrl('/dashboard');
-          });
+          // ✅ NEW: Check if user has completed profile details
+          this.checkProfileCompletion(data.username, data.role);
 
         } else {
           Swal.fire({
@@ -77,6 +70,63 @@ export class LoginComponent implements OnInit {
           title: 'Authentication Error',
           text: 'Invalid username or password. Please try again.',
           confirmButtonColor: '#d33'
+        });
+      }
+    });
+  }
+
+  // ✅ NEW METHOD: Check if profile is completed
+  checkProfileCompletion(username: string, role: string): void {
+    this.httpService.checkDetailsCompletion(username, role).subscribe({
+      next: (response: any) => {
+        if (response.detailsCompleted) {
+          // Profile complete - go to dashboard
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: `Welcome back, ${username}!`,
+            timer: 1500,
+            showConfirmButton: false
+          }).then(() => {
+            this.router.navigateByUrl('/dashboard');
+          });
+        } else {
+          // Profile incomplete - show prompt
+          Swal.fire({
+            icon: 'info',
+            title: 'Complete Your Profile',
+            text: 'Please complete your profile to access all features',
+            showCancelButton: true,
+            confirmButtonText: 'Complete Now',
+            cancelButtonText: 'Skip',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d'
+          }).then((result: any) => {
+            if (result.isConfirmed) {
+              // Redirect to user details page
+              this.router.navigate(['/user-details'], {
+                queryParams: {
+                  username: username,
+                  role: role
+                }
+              });
+            } else {
+              // Allow access but remind later
+              this.router.navigateByUrl('/dashboard');
+            }
+          });
+        }
+      },
+      error: () => {
+        // If check fails, allow login anyway
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: `Welcome back, ${username}!`,
+          timer: 1500,
+          showConfirmButton: false
+        }).then(() => {
+          this.router.navigateByUrl('/dashboard');
         });
       }
     });

@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.edutech.logisticsmanagementandtrackingsystem.jwt.JwtRequestFilter;
-import com.edutech.logisticsmanagementandtrackingsystem.service.UserService;
  
 @Configuration
 @EnableWebSecurity
@@ -35,7 +34,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         this.passwordEncoder = passwordEncoder;
     }
  
- 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
@@ -49,6 +47,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/resend-otp").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/verify-otp").permitAll()
+                
+                // NEW: Allow user details endpoints
+                .antMatchers(HttpMethod.POST, "/api/user-details/business").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user-details/driver").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user-details/customer").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/user-details/check-completion").permitAll()
+                
                 .antMatchers(HttpMethod.POST, "/api/business/cargo").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/drivers").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/cargo").hasAuthority("BUSINESS")
