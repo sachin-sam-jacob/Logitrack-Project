@@ -31,17 +31,14 @@ public class BusinessService {
     }
 
     public Business updateBusinessDetails(BusinessDetailsRequest request) {
-        // Find user
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
             throw new RuntimeException("User not found");
         }
 
-        // Find business by username
         Business business = businessRepository.findByname(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Business not found"));
 
-        // Update details
         business.setBusinessName(request.getBusinessName());
         business.setLocation(request.getLocation());
         business.setContactNumber(request.getContactNumber());
@@ -55,5 +52,11 @@ public class BusinessService {
         Business business = businessRepository.findByname(username)
                 .orElseThrow(() -> new RuntimeException("Business not found"));
         return business.isDetailsCompleted();
+    }
+
+    // NEW: Get business details
+    public Business getBusinessDetails(String username) {
+        return businessRepository.findByname(username)
+                .orElseThrow(() -> new RuntimeException("Business not found"));
     }
 }

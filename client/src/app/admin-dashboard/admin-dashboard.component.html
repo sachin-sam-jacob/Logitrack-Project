@@ -1,0 +1,312 @@
+<!-- admin-dashboard.component.html -->
+<div class="admin-shell">
+  
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    
+    <!-- BRAND -->
+    <div class="brand">
+      <div class="brand-icon">🚚</div>
+      <span class="brand-text">LogiTrack Admin</span>
+    </div>
+
+    <!-- ADMIN USER CARD -->
+    <div class="admin-card">
+      <div class="admin-avatar">A</div>
+      <div class="admin-info">
+        <h4>Administrator</h4>
+        <span class="admin-badge">ADMIN</span>
+      </div>
+    </div>
+
+    <!-- MENU -->
+    <nav class="admin-menu">
+      <a (click)="switchTab('statistics')" [class.active]="activeTab === 'statistics'">
+        <span class="icon">📊</span>
+        <p>Dashboard</p>
+      </a>
+
+      <a (click)="switchTab('pending')" [class.active]="activeTab === 'pending'">
+        <span class="icon">⏳</span>
+        <p>Pending Drivers</p>
+        <span class="badge" *ngIf="statistics.pendingDrivers > 0">
+          {{ statistics.pendingDrivers }}
+        </span>
+      </a>
+
+      <a (click)="switchTab('all')" [class.active]="activeTab === 'all'">
+        <span class="icon">👥</span>
+        <p>All Drivers</p>
+      </a>
+    </nav>
+
+    <!-- LOGOUT -->
+    <button class="logout-btn" (click)="logout()">
+      <span>🚪</span> Logout
+    </button>
+
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-main">
+
+    <!-- HEADER -->
+    <header class="admin-header">
+      <div>
+        <h1>Driver Verification System</h1>
+        <p class="subtitle">Manage and verify driver applications</p>
+      </div>
+    </header>
+
+    <!-- STATISTICS TAB -->
+    <div *ngIf="activeTab === 'statistics'" class="statistics-view">
+      
+      <div class="stats-grid">
+        <div class="stat-card blue">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>{{ statistics.totalDrivers || 0 }}</h3>
+            <p>Total Drivers</p>
+          </div>
+        </div>
+
+        <div class="stat-card yellow">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-content">
+            <h3>{{ statistics.pendingDrivers || 0 }}</h3>
+            <p>Pending Verification</p>
+          </div>
+        </div>
+
+        <div class="stat-card green">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <h3>{{ statistics.approvedDrivers || 0 }}</h3>
+            <p>Approved</p>
+          </div>
+        </div>
+
+        <div class="stat-card red">
+          <div class="stat-icon">❌</div>
+          <div class="stat-content">
+            <h3>{{ statistics.rejectedDrivers || 0 }}</h3>
+            <p>Rejected</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="action-cards">
+          <div class="action-card" (click)="switchTab('pending')">
+            <span class="action-icon">⏳</span>
+            <h3>Review Pending</h3>
+            <p>{{ statistics.pendingDrivers || 0 }} drivers waiting</p>
+          </div>
+          <div class="action-card" (click)="switchTab('all')">
+            <span class="action-icon">📋</span>
+            <h3>View All Drivers</h3>
+            <p>Manage driver database</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PENDING DRIVERS TAB -->
+    <div *ngIf="activeTab === 'pending'" class="drivers-view">
+      
+      <div class="view-header">
+        <h2>Pending Driver Verification</h2>
+        <p>{{ pendingDrivers.length || 0 }} applications pending review</p>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading drivers...</p>
+      </div>
+
+      <div *ngIf="!isLoading && pendingDrivers.length === 0" class="empty-state">
+        <span class="empty-icon">✅</span>
+        <h3>All Caught Up!</h3>
+        <p>No pending driver applications at the moment</p>
+      </div>
+
+      <div class="drivers-grid" *ngIf="!isLoading && pendingDrivers.length > 0">
+        <div class="driver-card" *ngFor="let driver of pendingDrivers">
+          
+          <div class="driver-header">
+            <div class="driver-avatar">
+              {{ driver.name?.charAt(0) | uppercase }}
+            </div>
+            <div class="driver-info">
+              <h3>{{ driver.name }}</h3>
+              <p class="driver-email">{{ driver.email }}</p>
+            </div>
+            <span class="status-badge pending">Pending</span>
+          </div>
+
+          <div class="driver-details">
+            <div class="detail-row">
+              <span class="label">📄 License:</span>
+              <span class="value">{{ driver.licenseNumber }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">🚗 Vehicle:</span>
+              <span class="value">{{ driver.vehicleType }} - {{ driver.vehicleNumber }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">📞 Contact:</span>
+              <span class="value">{{ driver.contactNumber }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">📍 Location:</span>
+              <span class="value">{{ driver.location || 'Not specified' }}</span>
+            </div>
+          </div>
+
+          <div class="driver-actions">
+            <button class="btn btn-view" (click)="viewDocuments(driver)">
+              📄 View Documents
+            </button>
+            <button class="btn btn-approve" (click)="approveDriver(driver.id)">
+              ✅ Approve
+            </button>
+            <button class="btn btn-reject" (click)="rejectDriver(driver.id)">
+              ❌ Reject
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ALL DRIVERS TAB -->
+    <div *ngIf="activeTab === 'all'" class="drivers-view">
+      
+      <div class="view-header">
+        <h2>All Drivers</h2>
+        <p>{{ allDrivers.length || 0 }} total drivers in system</p>
+      </div>
+
+      <div *ngIf="isLoading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading drivers...</p>
+      </div>
+
+      <div class="drivers-table" *ngIf="!isLoading">
+        <table>
+          <thead>
+            <tr>
+              <th>Driver</th>
+              <th>Vehicle Info</th>
+              <th>Contact</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let driver of allDrivers">
+              <td>
+                <div class="table-driver">
+                  <div class="table-avatar">{{ driver.name?.charAt(0) | uppercase }}</div>
+                  <div>
+                    <div class="table-name">{{ driver.name }}</div>
+                    <div class="table-email">{{ driver.email }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="vehicle-info">
+                  <div>{{ driver.vehicleType }}</div>
+                  <div class="vehicle-number">{{ driver.vehicleNumber }}</div>
+                </div>
+              </td>
+              <td>{{ driver.contactNumber }}</td>
+              <td>{{ driver.location || 'N/A' }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="driver.verificationStatus?.toLowerCase()">
+                  {{ driver.verificationStatus }}
+                </span>
+              </td>
+              <td>
+                <button class="btn-icon" (click)="viewDocuments(driver)" title="View Documents">
+                  👁️
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<!-- DOCUMENT VIEWER MODAL -->
+<div class="modal-overlay" *ngIf="showDocumentModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h2>Driver Documents - {{ selectedDriver?.name }}</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      
+      <div class="doc-section">
+        <h3>📄 License Proof</h3>
+        <div class="doc-viewer" *ngIf="selectedDriver?.licenseProofUrl">
+          <img 
+            [src]="selectedDriver.licenseProofUrl" 
+            alt="License Proof"
+            (error)="handleImageError($event, 'license')"
+          />
+        </div>
+        <p *ngIf="!selectedDriver?.licenseProofUrl" class="no-doc">No license proof uploaded</p>
+      </div>
+
+      <div class="doc-section">
+        <h3>🚗 Vehicle RC</h3>
+        <div class="doc-viewer" *ngIf="selectedDriver?.vehicleRcUrl">
+          <img 
+            [src]="selectedDriver.vehicleRcUrl" 
+            alt="Vehicle RC"
+            (error)="handleImageError($event, 'rc')"
+          />
+        </div>
+        <p *ngIf="!selectedDriver?.vehicleRcUrl" class="no-doc">No vehicle RC uploaded</p>
+      </div>
+
+      <div class="doc-info">
+        <div class="info-item">
+          <span class="info-label">License Number:</span>
+          <span class="info-value">{{ selectedDriver?.licenseNumber }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Vehicle Number:</span>
+          <span class="info-value">{{ selectedDriver?.vehicleNumber }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Status:</span>
+          <span class="status-badge" [ngClass]="selectedDriver?.verificationStatus?.toLowerCase()">
+            {{ selectedDriver?.verificationStatus }}
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer" *ngIf="selectedDriver?.verificationStatus === 'PENDING'">
+      <button class="btn btn-approve" (click)="approveDriver(selectedDriver.id)">
+        ✅ Approve Driver
+      </button>
+      <button class="btn btn-reject" (click)="rejectDriver(selectedDriver.id)">
+        ❌ Reject Driver
+      </button>
+    </div>
+
+  </div>
+</div>

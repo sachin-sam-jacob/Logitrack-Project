@@ -52,13 +52,15 @@ export class UserDetailsComponent implements OnInit {
         licenseNumber: ['', Validators.required],
         vehicleType: ['', Validators.required],
         vehicleNumber: ['', Validators.required],
-        contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
+        contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+        location: ['', Validators.required]
       });
     } else if (this.role === 'CUSTOMER') {
       this.detailsForm = this.fb.group({
         contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
         alternativeContactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-        address: ['', Validators.required]
+        address: ['', Validators.required],
+        location: ['', Validators.required] // ADDED location field
       });
     }
   }
@@ -66,6 +68,12 @@ export class UserDetailsComponent implements OnInit {
   onFileChange(event: any, type: string) {
     const file = event.target.files[0];
     if (file) {
+      // Validate file size (5MB max)
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire('File Too Large', 'Please upload a file smaller than 5MB', 'warning');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = reader.result as string;
@@ -77,21 +85,50 @@ export class UserDetailsComponent implements OnInit {
           this.vehicleRcName = file.name;
         }
       };
+      reader.onerror = () => {
+        Swal.fire('Error', 'Failed to read file', 'error');
+      };
       reader.readAsDataURL(file);
     }
   }
 
   onSubmit() {
+    // Check form validity
     if (this.detailsForm.invalid) {
       this.detailsForm.markAllAsTouched();
-      Swal.fire('Incomplete Form', 'Please fill all required fields', 'warning');
+      
+      // Show specific validation errors
+      const errors: string[] = [];
+      Object.keys(this.detailsForm.controls).forEach(key => {
+        const control = this.detailsForm.get(key);
+        if (control?.invalid) {
+          if (control.errors?.['required']) {
+            errors.push(`${this.formatFieldName(key)} is required`);
+          }
+          if (control.errors?.['pattern']) {
+            errors.push(`${this.formatFieldName(key)} is invalid`);
+          }
+        }
+      });
+
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Form',
+        html: errors.join('<br>'),
+        confirmButtonColor: '#3085d6'
+      });
       return;
     }
 
-    // Driver validation
+    // Driver-specific validation
     if (this.role === 'DRIVER') {
       if (!this.licenseProofBase64 || !this.vehicleRcBase64) {
-        Swal.fire('Missing Documents', 'Please upload both License Proof and Vehicle RC', 'warning');
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Documents',
+          text: 'Please upload both License Proof and Vehicle RC',
+          confirmButtonColor: '#3085d6'
+        });
         return;
       }
     }
@@ -103,6 +140,7 @@ export class UserDetailsComponent implements OnInit {
       ...this.detailsForm.value
     };
 
+    // Add files for driver
     if (this.role === 'DRIVER') {
       payload['licenseProof'] = this.licenseProofBase64;
       payload['vehicleRc'] = this.vehicleRcBase64;
@@ -131,7 +169,13 @@ export class UserDetailsComponent implements OnInit {
         this.isSubmitting = false;
       },
       error: (err) => {
-        Swal.fire('Submission Failed', err.error?.message || 'Please try again', 'error');
+        console.error('Submission error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission Failed',
+          text: err.error?.message || 'Please try again',
+          confirmButtonColor: '#d33'
+        });
         this.isSubmitting = false;
       }
     });
@@ -145,10 +189,18 @@ export class UserDetailsComponent implements OnInit {
       showCancelButton: true,
       confirmButtonText: 'Yes, Skip',
       cancelButtonText: 'No, Complete Now'
-    }).then((result:any) => {
+    }).then((result: any) => {
       if (result.isConfirmed) {
         this.router.navigate(['/login']);
       }
     });
+  }
+
+  // Helper function to format field names
+  private formatFieldName(field: string): string {
+    return field
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase())
+      .trim();
   }
 }

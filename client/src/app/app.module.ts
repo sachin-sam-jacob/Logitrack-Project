@@ -13,10 +13,13 @@ import { AssginCargoComponent } from './assgin-cargo/assgin-cargo.component';
 import { ViewcargostatusComponent } from './viewcargostatus/viewcargostatus.component';
 import { WelcomePageComponent } from './welcomepage/welcomepage.component';
 import { Viewbusinesscargo } from './viewbusinesscargo/viewbusinesscargo.component';
-import { UserDetailsComponent } from './userdetails/user-details.component'; // NEW
+import { UserDetailsComponent } from './userdetails/user-details.component';
+import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 
 import { HttpService } from '../services/http.service';
-import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
+import { AdminGuard } from './guards/admin.guard';
+import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
 
 @NgModule({
   declarations: [
@@ -29,9 +32,10 @@ import { ProfileSettingsComponent } from './profile-settings/profile-settings.co
     ViewcargostatusComponent,
     WelcomePageComponent,
     Viewbusinesscargo,
-    UserDetailsComponent ,
-    ProfileSettingsComponent
-
+    UserDetailsComponent,
+    ProfileSettingsComponent,
+    AdminDashboardComponent,
+    DeliveryApprovalsComponent
   ],
   imports: [
     BrowserModule,
@@ -40,7 +44,7 @@ import { ProfileSettingsComponent } from './profile-settings/profile-settings.co
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [HttpService, HttpClientModule],
+  providers: [HttpService, AdminGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {}

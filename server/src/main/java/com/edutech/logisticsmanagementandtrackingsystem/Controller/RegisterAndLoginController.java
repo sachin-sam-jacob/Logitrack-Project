@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +22,7 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.Customer;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Driver;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
 import com.edutech.logisticsmanagementandtrackingsystem.jwt.JwtUtil;
+import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.service.BusinessService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.CustomerService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.DriverService;
@@ -30,6 +31,8 @@ import com.edutech.logisticsmanagementandtrackingsystem.service.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.security.authentication.BadCredentialsException;
+
 
 @RestController
 @RequestMapping("/api")
@@ -55,6 +58,12 @@ public class RegisterAndLoginController {
 
     @Autowired  
     private JwtUtil jwtUtil;  
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // REGISTER - FIXED
     @PostMapping("/register")  
@@ -104,7 +113,7 @@ public class RegisterAndLoginController {
                 customer.setName(user.getUsername());  
                 customer.setEmail(user.getEmail());  
                 customerService.createCustomer(customer);  
-            } else {  
+            } else if (user.getRole().equals("DRIVER")) {  
                 Driver driver = new Driver();  
                 driver.setName(user.getUsername());  
                 driver.setEmail(user.getEmail());  
@@ -121,33 +130,61 @@ public class RegisterAndLoginController {
         }
     }
 
-    // LOGIN 
+    // LOGIN - FIXED with better error handling
     @PostMapping("/login")  
     public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {  
-        User user = userService.getUserByUsername(loginRequest.getUsername());  
-        if (!user.isEnabled()) {  
-            throw new ResponseStatusException(  
-                HttpStatus.FORBIDDEN,  
-                "Please verify your email first"  
+        try {
+            // Check if user exists
+            User user = userRepository.findByUsername(loginRequest.getUsername());
+            if (user == null) {
+                throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid username or password"
+                );
+            }
+
+            // Special handling for ADMIN role - skip email verification check
+            if (!"ADMIN".equals(user.getRole()) && !user.isEnabled()) {  
+                throw new ResponseStatusException(  
+                    HttpStatus.FORBIDDEN,  
+                    "Please verify your email first"  
+                );  
+            }
+
+            // Authenticate
+            authenticationManager.authenticate(  
+                new UsernamePasswordAuthenticationToken(  
+                    loginRequest.getUsername(),  
+                    loginRequest.getPassword()  
+                )  
             );  
-        }  
-        authenticationManager.authenticate(  
-            new UsernamePasswordAuthenticationToken(  
-                loginRequest.getUsername(),  
-                loginRequest.getPassword()  
-            )  
-        );  
-        final UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());  
-        final String token = jwtUtil.generateToken(userDetails.getUsername());  
-        return ResponseEntity.ok(  
-            new LoginResponse(  
-                token,  
-                user.getUsername(),  
-                user.getEmail(),  
-                user.getRole(),  
-                user.getId()  
-            )  
-        );  
+
+            // Generate token
+            final UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());  
+            final String token = jwtUtil.generateToken(userDetails.getUsername());  
+
+            return ResponseEntity.ok(  
+                new LoginResponse(  
+                    token,  
+                    user.getUsername(),  
+                    user.getEmail(),  
+                    user.getRole(),  
+                    user.getId()  
+                )  
+            );
+        } catch (BadCredentialsException e) {
+            throw new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid username or password"
+            );
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "Login failed: " + e.getMessage()
+            );
+        }
     }
 
     //RESEND OTP
@@ -167,5 +204,49 @@ public class RegisterAndLoginController {
         return ResponseEntity.ok(
                 Map.of("message", "OTP resent successfully")
         );
+    }
+
+    // Create default admin (run once) - FIXED
+    @PostMapping("/create-admin")
+    public ResponseEntity<String> createAdmin() {
+        try {
+            User existingAdmin = userRepository.findByUsername("admin");
+            if (existingAdmin != null) {
+                return ResponseEntity.badRequest().body("Admin already exists");
+            }
+
+            User admin = new User();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin123"));
+            admin.setEmail("admin@logitrack.com");
+            admin.setRole("ADMIN");
+            admin.setEnabled(true);
+            admin.setEmailVerified(true);
+            userRepository.save(admin);
+
+            return ResponseEntity.ok("Admin created successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("Failed to create admin: " + e.getMessage());
+        }
+    }
+
+    // Helper endpoint to verify password encoding (remove in production)
+    @PostMapping("/verify-password")
+    public ResponseEntity<Map<String, Boolean>> verifyPassword(@RequestBody Map<String, String> request) {
+        try {
+            String username = request.get("username");
+            String password = request.get("password");
+            
+            User user = userRepository.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.ok(Map.of("valid", false));
+            }
+            
+            boolean matches = passwordEncoder.matches(password, user.getPassword());
+            return ResponseEntity.ok(Map.of("valid", matches));
+        } catch (Exception e) {
+            return ResponseEntity.ok(Map.of("valid", false));
+        }
     }
 }

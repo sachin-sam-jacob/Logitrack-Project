@@ -40,12 +40,34 @@
           <p>Drivers</p>
         </a>
 
+        <a routerLink="/dashboard/delivery-approvals" routerLinkActive="active">
+       <span>✅</span>
+       <p>Approve Deliveries</p>
+     </a>
+
          <a routerLink="/dashboard/profile" routerLinkActive="active">
           <span>⚙️</span>
           <p>Profile Settings</p>
         </a>
         
       </ng-container>
+
+      <ng-container *ngIf="roleName === 'ADMIN'">
+  <a routerLink="/admin-dashboard/pending-drivers" routerLinkActive="active">
+    <span>⏳</span>
+    <p>Pending Drivers</p>
+  </a>
+
+  <a routerLink="/admin-dashboard/all-drivers" routerLinkActive="active">
+    <span>👥</span>
+    <p>All Drivers</p>
+  </a>
+
+  <a routerLink="/admin-dashboard/statistics" routerLinkActive="active">
+    <span>📊</span>
+    <p>Statistics</p>
+  </a>
+</ng-container>
 
       <!-- DRIVER -->
       <ng-container *ngIf="roleName === 'DRIVER'">

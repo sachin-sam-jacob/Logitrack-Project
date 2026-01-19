@@ -8,14 +8,26 @@ import { AssginCargoComponent } from './assgin-cargo/assgin-cargo.component';
 import { ViewcargostatusComponent } from './viewcargostatus/viewcargostatus.component';
 import { WelcomePageComponent } from './welcomepage/welcomepage.component';
 import { Viewbusinesscargo } from './viewbusinesscargo/viewbusinesscargo.component';
-import { UserDetailsComponent } from './userdetails/user-details.component'; // NEW
+import { UserDetailsComponent } from './userdetails/user-details.component';
 import { ProfileSettingsComponent } from './profile-settings/profile-settings.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { AdminGuard } from './guards/admin.guard';
+import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
 
 const routes: Routes = [
   { path: '', component: WelcomePageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'registration', component: RegistrationComponent },
-  { path: 'user-details', component: UserDetailsComponent }, // NEW
+  { path: 'user-details', component: UserDetailsComponent },
+  
+  // Admin Dashboard (Protected)
+  {
+    path: 'admin-dashboard',
+    component: AdminDashboardComponent,
+    canActivate: [AdminGuard]
+  },
+
+  // User Dashboard
   {
     path: 'dashboard',
     component: DashbaordComponent,
@@ -25,10 +37,11 @@ const routes: Routes = [
       { path: 'assign-cargo', component: AssginCargoComponent },
       { path: 'view-cargo', component: ViewcargostatusComponent },
       { path: 'view-business-cargo', component: Viewbusinesscargo },
-      { path: 'profile', component: ProfileSettingsComponent } // NEW
-
+      { path: 'delivery-approvals', component: DeliveryApprovalsComponent }, // NEW
+      { path: 'profile', component: ProfileSettingsComponent }
     ]
   },
+  
   { path: 'addcargo', component: AddcargoComponent },
   { path: 'asgin-cargo', component: AssginCargoComponent },
   { path: 'viewcargostatus', component: ViewcargostatusComponent },

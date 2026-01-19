@@ -52,8 +52,21 @@ export class LoginComponent implements OnInit {
           this.authService.saveToken(data.token);
           this.authService.setUsername(data.username);
 
-          // ✅ NEW: Check if user has completed profile details
-          this.checkProfileCompletion(data.username, data.role);
+          // ✅ FIXED: Skip profile check for ADMIN
+          if (data.role === 'ADMIN') {
+            Swal.fire({
+              icon: 'success',
+              title: 'Login Successful',
+              text: `Welcome back, ${data.username}!`,
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              this.router.navigateByUrl('/admin-dashboard');
+            });
+          } else {
+            // For other roles, check profile completion
+            this.checkProfileCompletion(data.username, data.role);
+          }
 
         } else {
           Swal.fire({
@@ -75,7 +88,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // ✅ NEW METHOD: Check if profile is completed
+  // ✅ Profile completion check (only for non-ADMIN users)
   checkProfileCompletion(username: string, role: string): void {
     this.httpService.checkDetailsCompletion(username, role).subscribe({
       next: (response: any) => {

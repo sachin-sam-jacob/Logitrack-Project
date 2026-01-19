@@ -17,7 +17,6 @@ public class Business {
     @Column(name="email")
     private String email;
     
-    // NEW FIELDS
     @Column(name="business_name")
     private String businessName;
     
@@ -28,7 +27,7 @@ public class Business {
     private String contactNumber;
     
     @Column(name="business_type")
-    private String businessType; // e.g., "Retail", "Manufacturing", etc.
+    private String businessType;
     
     @Column(name="details_completed", nullable = false)
     private boolean detailsCompleted = false;
@@ -37,7 +36,6 @@ public class Business {
     @JsonIgnore
     private List<Cargo> cargos;
 
-    // Constructors
     public Business(String name, String email, List<Cargo> cargos) {
         this.name = name;
         this.email = email;
@@ -47,7 +45,6 @@ public class Business {
     public Business() {
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -120,4 +117,3 @@ public class Business {
         this.detailsCompleted = detailsCompleted;
     }
 }
- 

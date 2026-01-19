@@ -1,10 +1,6 @@
 package com.edutech.logisticsmanagementandtrackingsystem.service;
  
- 
-import java.util.Optional;
-
 import javax.persistence.EntityNotFoundException;
- 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
  
@@ -16,7 +12,6 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CustomerRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepository;
- 
  
 @Service
 public class CustomerService {
@@ -51,7 +46,6 @@ public class CustomerService {
         );
     }
 
-    // NEW METHOD
     public Customer updateCustomerDetails(CustomerDetailsRequest request) {
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
@@ -63,10 +57,10 @@ public class CustomerService {
             throw new RuntimeException("Customer not found");
         }
 
-        // Update details
         customer.setContactNumber(request.getContactNumber());
         customer.setAlternativeContactNumber(request.getAlternativeContactNumber());
         customer.setAddress(request.getAddress());
+        customer.setLocation(request.getLocation()); // ADDED
         customer.setDetailsCompleted(true);
 
         return customerRepository.save(customer);
@@ -78,5 +72,13 @@ public class CustomerService {
             throw new RuntimeException("Customer not found");
         }
         return customer.isDetailsCompleted();
+    }
+
+    public Customer getCustomerDetails(String username) {
+        Customer customer = customerRepository.findByName(username);
+        if (customer == null) {
+            throw new RuntimeException("Customer not found");
+        }
+        return customer;
     }
 }

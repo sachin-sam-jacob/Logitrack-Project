@@ -1,58 +1,155 @@
-<div class="assign-container">
+<div class="driver-cargo-container">
 
-  <!-- Header -->
-  <div class="page-header">
-    <h2>📦 Update Cargo Status</h2>
-    <p>Manage delivery progress of assigned cargos</p>
+  <!-- NOT APPROVED MESSAGE -->
+  <div *ngIf="!isApproved" class="verification-message">
+    <div class="message-card" [ngClass]="verificationStatus.toLowerCase()">
+      <div class="message-icon">
+        {{ verificationStatus === 'PENDING' ? '⏳' : '❌' }}
+      </div>
+      <h3>{{ verificationStatus === 'PENDING' ? 'Verification Pending' : 'Profile Rejected' }}</h3>
+      <p>
+        {{ verificationStatus === 'PENDING' 
+           ? 'Your profile is under review by admin. You will be able to access features once approved.'
+           : 'Your profile was rejected. Please update your details and resubmit.' }}
+      </p>
+      <button *ngIf="verificationStatus === 'REJECTED'" 
+              class="btn-primary" 
+              routerLink="/dashboard/profile">
+        Update Profile
+      </button>
+    </div>
   </div>
 
-  <!-- Error Message -->
-  <div class="alert error" *ngIf="showError">
-    {{ errorMessage }}
-  </div>
+  <!-- APPROVED - SHOW CARGOS -->
+  <div *ngIf="isApproved">
+    
+    <div class="page-header">
+      <h2>📦 My Assigned Cargos</h2>
+      <p>Update delivery status and upload proof</p>
+    </div>
 
-  <!-- Success Message -->
-  <div class="alert success" *ngIf="showMessage">
-    {{ responseMessage }}
-  </div>
+    <!-- EMPTY STATE -->
+    <div *ngIf="cargList.length === 0" class="empty-state">
+      <span class="empty-icon">🚚</span>
+      <h3>No Cargos Assigned</h3>
+      <p>You don't have any assigned cargos at the moment</p>
+    </div>
 
-  <!-- Cargo Table -->
-  <div class="card">
-    <table class="cargo-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Content</th>
-          <th>Size</th>
-          <th>Status</th>
-          <th>Update</th>
-        </tr>
-      </thead>
+    <!-- CARGO LIST -->
+    <div class="cargo-grid" *ngIf="cargList.length > 0">
+      
+      <div class="cargo-card" *ngFor="let cargo of cargList">
+        
+        <div class="cargo-header">
+          <h3>#{{ cargo.id }} - {{ cargo.content }}</h3>
+          <span class="status-badge" [ngClass]="getStatusClass(cargo.status)">
+            {{ cargo.status }}
+          </span>
+        </div>
 
-      <tbody>
-        <tr *ngFor="let cargo of cargList">
-          <td>#{{ cargo.id }}</td>
-          <td>{{ cargo.content }}</td>
-          <td>{{ cargo.size }}</td>
-          <td>
-            <span class="status-badge">{{ cargo.status }}</span>
-          </td>
-          <td class="action-cell">
-            <select
-              (change)="onStatusChange($any($event.target).value, cargo.id)">
-              <option value="">Select Status</option>
-              <option value="PICKED_UP">Picked Up</option>
-              <option value="IN_TRANSIT">In Transit</option>
-              <option value="DELIVERED">Delivered</option>
-            </select>
+        <div class="cargo-details">
+          <div class="detail-row">
+            <span class="label">📦 Size:</span>
+            <span class="value">{{ cargo.size }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">📍 Route:</span>
+            <span class="value">{{ cargo.sourceLocation }} → {{ cargo.destinationLocation }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">👤 Customer:</span>
+            <span class="value">{{ cargo.customerName }} ({{ cargo.customerContact }})</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">🏠 Address:</span>
+            <span class="value">{{ cargo.customerAddress }}</span>
+          </div>
+          <div class="detail-row" *ngIf="cargo.estimatedDeliveryDate">
+            <span class="label">⏰ Est. Delivery:</span>
+            <span class="value">{{ cargo.estimatedDeliveryDate | date:'short' }}</span>
+          </div>
+        </div>
 
-            <button class="btn-update" (click)="updateStatus()">
-              Update
+        <!-- STATUS UPDATE ACTIONS -->
+        <div class="cargo-actions" *ngIf="cargo.status !== 'DELIVERED' && cargo.status !== 'AWAITING_APPROVAL'">
+          
+          <div *ngFor="let nextStatus of getNextStatus(cargo.status)">
+            <button 
+              class="btn btn-update"
+              (click)="selectCargoForUpdate(cargo)">
+              Update to {{ nextStatus }}
             </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+          </div>
+
+        </div>
+
+        <!-- AWAITING APPROVAL MESSAGE -->
+        <div class="info-message" *ngIf="cargo.status === 'AWAITING_APPROVAL'">
+          ⏳ Awaiting business approval of delivery proof
+        </div>
+
+        <!-- DELIVERED MESSAGE -->
+        <div class="success-message" *ngIf="cargo.status === 'DELIVERED'">
+          ✅ Delivery completed successfully
+        </div>
+
+      </div>
+    </div>
+
+    <!-- UPDATE STATUS MODAL -->
+    <div class="modal-overlay" *ngIf="selectedCargo" (click)="selectedCargo = null">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        
+        <div class="modal-header">
+          <h2>Update Status - Cargo #{{ selectedCargo.id }}</h2>
+          <button class="close-btn" (click)="selectedCargo = null">✕</button>
+        </div>
+
+        <div class="modal-body">
+          
+          <div class="form-group">
+            <label>Delivery Notes (Optional)</label>
+            <textarea 
+              [(ngModel)]="deliveryNotes" 
+              rows="3"
+              placeholder="Add any notes about the delivery..."></textarea>
+          </div>
+
+          <!-- DELIVERY PROOF UPLOAD (Required for DELIVERED status) -->
+          <div class="form-group" *ngIf="getNextStatus(selectedCargo.status).includes('DELIVERED')">
+            <label>Upload Delivery Proof <span class="required">*</span></label>
+            <div class="file-upload">
+              <input 
+                type="file" 
+                (change)="onFileChange($event)" 
+                accept="image/*" 
+                id="delivery-proof" />
+              <label for="delivery-proof" class="file-label">
+                {{ deliveryProofName || '📷 Choose Photo' }}
+              </label>
+            </div>
+            <small class="help-text">
+              ⓘ Required: Take a clear photo showing successful delivery
+            </small>
+          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            *ngFor="let nextStatus of getNextStatus(selectedCargo.status)"
+            class="btn btn-primary"
+            (click)="updateStatus(selectedCargo.id, nextStatus)">
+            Confirm {{ nextStatus }}
+          </button>
+          <button class="btn btn-secondary" (click)="selectedCargo = null">
+            Cancel
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
 </div>

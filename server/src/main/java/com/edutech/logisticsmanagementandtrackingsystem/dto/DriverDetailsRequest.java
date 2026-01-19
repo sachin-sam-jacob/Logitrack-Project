@@ -8,8 +8,8 @@ public class DriverDetailsRequest {
     private String licenseProof; // Base64 encoded
     private String vehicleRc; // Base64 encoded
     private String contactNumber;
+    private String location; // NEW
 
-    // Getters and Setters
     public String getUsername() {
         return username;
     }
@@ -64,5 +64,13 @@ public class DriverDetailsRequest {
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

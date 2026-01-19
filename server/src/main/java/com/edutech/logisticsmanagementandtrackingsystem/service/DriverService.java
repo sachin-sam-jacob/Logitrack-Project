@@ -1,26 +1,20 @@
 package com.edutech.logisticsmanagementandtrackingsystem.service;
- 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.edutech.logisticsmanagementandtrackingsystem.dto.DriverDetailsRequest;
+import com.edutech.logisticsmanagementandtrackingsystem.dto.DriverVerificationRequest;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Cargo;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Driver;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
- 
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.DriverRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepository;
- 
+
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
- 
- 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import javax.persistence.EntityNotFoundException;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DriverService {
@@ -35,37 +29,124 @@ public class DriverService {
     private UserRepository userRepository;
 
     @Autowired
-    private CloudinaryService cloudinaryService; // NEW
+    private CloudinaryService cloudinaryService;
  
     public Driver createDriver(Driver driver) {
         return driverRepository.save(driver);
     }
  
+    /**
+     * Get only approved and available drivers
+     */
     public List<Driver> getAllDrivers() {
+        return driverRepository.findAll().stream()
+                .filter(d -> "APPROVED".equals(d.getVerificationStatus()) && d.isAvailable())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get drivers by specific location (current location)
+     */
+    public List<Driver> getDriversByLocation(String location) {
+        return driverRepository.findAll().stream()
+                .filter(d -> "APPROVED".equals(d.getVerificationStatus()))
+                .filter(Driver::isAvailable)
+                .filter(d -> {
+                    String driverLocation = d.getCurrentLocation() != null 
+                        ? d.getCurrentLocation() 
+                        : d.getBaseLocation();
+                    return driverLocation != null && 
+                           driverLocation.equalsIgnoreCase(location);
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get all drivers (for admin)
+     */
+    public List<Driver> getAllDriversForAdmin() {
         return driverRepository.findAll();
     }
- 
-    public List<Cargo> viewDriverCargos(Long driverId) {
-        User user = userRepository.findById(driverId).get();
-        Driver driver = driverRepository.findByName(user.getUsername());
-        if(driver == null)
-            throw new EntityNotFoundException("No driver with such username.");
-        if(cargoRepository.findByDriverId(driver.getId()) != null)
-            return cargoRepository.findByDriverId(driver.getId());
-        else
-            throw new EntityNotFoundException("No cargos associated with this driver");
+
+    /**
+     * Get pending drivers for verification
+     */
+    public List<Driver> getPendingDrivers() {
+        return driverRepository.findAll().stream()
+                .filter(d -> "PENDING".equals(d.getVerificationStatus()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Verify driver (approve/reject) - ONLY ADMIN
+     */
+    public Driver verifyDriver(DriverVerificationRequest request) {
+        Driver driver = driverRepository.findById(request.getDriverId())
+                .orElseThrow(() -> new RuntimeException("Driver not found"));
+
+        driver.setVerificationStatus(request.getStatus());
+        
+        if ("REJECTED".equals(request.getStatus())) {
+            driver.setRejectionReason(request.getRejectionReason());
+            driver.setAvailable(false);
+        } else if ("APPROVED".equals(request.getStatus())) {
+            // Set current location to base location initially
+            if (driver.getCurrentLocation() == null) {
+                driver.setCurrentLocation(driver.getBaseLocation());
+            }
+            driver.setAvailable(true);
+            driver.setRejectionReason(null);
+        }
+
+        return driverRepository.save(driver);
     }
  
+    /**
+     * Get cargos assigned to driver
+     */
+    public List<Cargo> viewDriverCargos(Long driverId) {
+        User user = userRepository.findById(driverId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        
+        Driver driver = driverRepository.findByName(user.getUsername());
+        if (driver == null) {
+            throw new EntityNotFoundException("No driver with such username.");
+        }
+
+        // Check if driver is approved
+        if (!"APPROVED".equals(driver.getVerificationStatus())) {
+            throw new RuntimeException("Driver is not approved yet. Please wait for admin approval.");
+        }
+
+        List<Cargo> cargos = cargoRepository.findByDriverId(driver.getId());
+        if (cargos == null || cargos.isEmpty()) {
+            throw new EntityNotFoundException("No cargos associated with this driver");
+        }
+
+        return cargos;
+    }
+ 
+    /**
+     * Update cargo status - called by driver
+     */
     public boolean updateCargoStatus(Long cargoId, String newStatus) {
         Cargo cargo = cargoRepository.findById(cargoId)
                 .orElseThrow(() -> new EntityNotFoundException(cargoId + " not found!!"));
  
+        // Verify driver is approved
+        Driver driver = cargo.getDriver();
+        if (driver != null && !"APPROVED".equals(driver.getVerificationStatus())) {
+            throw new RuntimeException("Driver is not approved. Cannot update cargo status.");
+        }
+
         cargo.setStatus(newStatus);
         cargoRepository.save(cargo);
         return true;
     }
 
-    // UPDATED METHOD - Upload to Cloudinary
+    /**
+     * Update driver details
+     */
     public Driver updateDriverDetails(DriverDetailsRequest request) {
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
@@ -82,10 +163,15 @@ public class DriverService {
         driver.setVehicleType(request.getVehicleType());
         driver.setVehicleNumber(request.getVehicleNumber());
         driver.setContactNumber(request.getContactNumber());
+        driver.setBaseLocation(request.getLocation());
         
-        // Upload License Proof to Cloudinary
+        // Set current location to base location if not already set
+        if (driver.getCurrentLocation() == null) {
+            driver.setCurrentLocation(request.getLocation());
+        }
+        
+        // Upload files
         if (request.getLicenseProof() != null && !request.getLicenseProof().isEmpty()) {
-            // Delete old image from Cloudinary if exists
             if (driver.getLicenseProofUrl() != null && !driver.getLicenseProofUrl().isEmpty()) {
                 try {
                     cloudinaryService.deleteImage(driver.getLicenseProofUrl());
@@ -94,7 +180,6 @@ public class DriverService {
                 }
             }
             
-            // Upload new image
             String licenseUrl = cloudinaryService.uploadBase64Image(
                 request.getLicenseProof(), 
                 "logitrack/driver-licenses"
@@ -102,9 +187,7 @@ public class DriverService {
             driver.setLicenseProofUrl(licenseUrl);
         }
 
-        // Upload Vehicle RC to Cloudinary
         if (request.getVehicleRc() != null && !request.getVehicleRc().isEmpty()) {
-            // Delete old image from Cloudinary if exists
             if (driver.getVehicleRcUrl() != null && !driver.getVehicleRcUrl().isEmpty()) {
                 try {
                     cloudinaryService.deleteImage(driver.getVehicleRcUrl());
@@ -113,7 +196,6 @@ public class DriverService {
                 }
             }
 
-            // Upload new image
             String rcUrl = cloudinaryService.uploadBase64Image(
                 request.getVehicleRc(), 
                 "logitrack/vehicle-rc"
@@ -121,7 +203,19 @@ public class DriverService {
             driver.setVehicleRcUrl(rcUrl);
         }
         
-        driver.setDetailsCompleted(true);
+        // Mark as completed if documents are uploaded
+        if ((request.getLicenseProof() != null && !request.getLicenseProof().isEmpty()) ||
+            (driver.getLicenseProofUrl() != null && !driver.getLicenseProofUrl().isEmpty())) {
+            driver.setDetailsCompleted(true);
+            
+            // Set to PENDING for admin verification (reset if previously rejected)
+            if ("REJECTED".equals(driver.getVerificationStatus()) || 
+                driver.getVerificationStatus() == null || 
+                driver.getVerificationStatus().isEmpty()) {
+                driver.setVerificationStatus("PENDING");
+                driver.setAvailable(false); // Not available until approved
+            }
+        }
 
         return driverRepository.save(driver);
     }
@@ -132,5 +226,30 @@ public class DriverService {
             throw new RuntimeException("Driver not found");
         }
         return driver.isDetailsCompleted();
+    }
+
+    public Driver getDriverDetails(String username) {
+        Driver driver = driverRepository.findByName(username);
+        if (driver == null) {
+            throw new RuntimeException("Driver not found");
+        }
+        return driver;
+    }
+
+    /**
+     * Toggle availability - ONLY for approved drivers
+     */
+    public Driver toggleAvailability(String username) {
+        Driver driver = driverRepository.findByName(username);
+        if (driver == null) {
+            throw new RuntimeException("Driver not found");
+        }
+
+        if (!"APPROVED".equals(driver.getVerificationStatus())) {
+            throw new RuntimeException("Only approved drivers can change availability");
+        }
+
+        driver.setAvailable(!driver.isAvailable());
+        return driverRepository.save(driver);
     }
 }

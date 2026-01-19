@@ -1,29 +1,16 @@
 package com.edutech.logisticsmanagementandtrackingsystem.service;
- 
- 
+
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.core.authority.AuthorityUtils;
-
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.security.core.userdetails.UserDetailsService;
-
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.springframework.stereotype.Service;
- 
+
 import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
-
 import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepository;
- 
-import java.util.ArrayList;
 
-import java.util.List;
- 
- 
 @Service
 public class UserService implements UserDetailsService {
 
@@ -34,7 +21,6 @@ public class UserService implements UserDetailsService {
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(User user) {
-
         User existingUser = userRepository.findByUsername(user.getUsername());
 
         if (existingUser != null) {
@@ -53,7 +39,6 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserByUsername(String username) {
-
         User user = userRepository.findByUsername(username);
 
         if (user == null) {
@@ -73,7 +58,8 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        if (!user.isEnabled()) {
+        // FIXED: Allow ADMIN to login even without email verification
+        if (!"ADMIN".equals(user.getRole()) && !user.isEnabled()) {
             throw new UsernameNotFoundException(
                 "Email not verified. Please verify OTP."
             );

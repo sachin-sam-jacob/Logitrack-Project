@@ -17,6 +17,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import com.edutech.logisticsmanagementandtrackingsystem.jwt.JwtRequestFilter;
  
+
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -43,24 +45,41 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
+                // Public endpoints
                 .antMatchers(HttpMethod.POST, "/api/register").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/resend-otp").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/verify-otp").permitAll()
-                
-                // NEW: Allow user details endpoints
+                .antMatchers(HttpMethod.POST, "/api/create-admin").permitAll()
+
+                // User details endpoints
                 .antMatchers(HttpMethod.POST, "/api/user-details/business").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/user-details/driver").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/user-details/customer").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/user-details/check-completion").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/user-details/business").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/user-details/driver").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/user-details/customer").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user-details/driver/toggle-availability").hasAuthority("DRIVER")
                 
+                // Admin endpoints
+                .antMatchers("/api/admin/**").hasAuthority("ADMIN")
+                
+                // Business endpoints
                 .antMatchers(HttpMethod.POST, "/api/business/cargo").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/drivers").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/cargo").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.POST, "/api/business/assign-cargo").hasAuthority("BUSINESS")
+                .antMatchers(HttpMethod.GET, "/api/business/my-cargos").hasAuthority("BUSINESS")
+                .antMatchers(HttpMethod.GET, "/api/business/search-cargo").hasAuthority("BUSINESS")
+                
+                // Driver endpoints
                 .antMatchers(HttpMethod.GET, "/api/driver/cargo").hasAuthority("DRIVER")
                 .antMatchers(HttpMethod.PUT, "/api/driver/update-cargo-status").hasAuthority("DRIVER")
+                
+                // Customer endpoints
                 .antMatchers(HttpMethod.GET, "/api/customer/cargo-status").hasAuthority("CUSTOMER")
+                
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

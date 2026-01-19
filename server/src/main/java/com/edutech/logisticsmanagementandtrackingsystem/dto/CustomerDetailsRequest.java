@@ -5,6 +5,7 @@ public class CustomerDetailsRequest {
     private String contactNumber;
     private String alternativeContactNumber;
     private String address;
+    private String location; // ADDED
 
     // Getters and Setters
     public String getUsername() {
@@ -37,5 +38,13 @@ public class CustomerDetailsRequest {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 }

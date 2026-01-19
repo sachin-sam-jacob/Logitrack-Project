@@ -25,6 +25,11 @@ export class ProfileSettingsComponent implements OnInit {
   licenseProofName: string = '';
   vehicleRcName: string = '';
 
+  // Driver status
+  verificationStatus: string = '';
+  rejectionReason: string = '';
+  isAvailable: boolean = true;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -41,20 +46,8 @@ export class ProfileSettingsComponent implements OnInit {
       return;
     }
 
-    this.checkCompletion();
     this.initForm();
-  }
-
-  checkCompletion(): void {
-    this.httpService.checkDetailsCompletion(this.username, this.role).subscribe({
-      next: (response: any) => {
-        this.detailsCompleted = response.detailsCompleted;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      }
-    });
+    this.loadExistingDetails();
   }
 
   initForm() {
@@ -70,20 +63,78 @@ export class ProfileSettingsComponent implements OnInit {
         licenseNumber: ['', Validators.required],
         vehicleType: ['', Validators.required],
         vehicleNumber: ['', Validators.required],
-        contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]]
+        contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+        location: ['', Validators.required]
       });
     } else if (this.role === 'CUSTOMER') {
       this.detailsForm = this.fb.group({
         contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
         alternativeContactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-        address: ['', Validators.required]
+        address: ['', Validators.required],
+        location: ['', Validators.required] // ADDED
       });
     }
+  }
+
+  loadExistingDetails() {
+    let getDetailsObservable;
+    
+    if (this.role === 'BUSINESS') {
+      getDetailsObservable = this.httpService.getBusinessDetails(this.username);
+    } else if (this.role === 'DRIVER') {
+      getDetailsObservable = this.httpService.getDriverDetails(this.username);
+    } else {
+      getDetailsObservable = this.httpService.getCustomerDetails(this.username);
+    }
+
+    getDetailsObservable.subscribe({
+      next: (data: any) => {
+        this.detailsCompleted = data.detailsCompleted || false;
+        
+        if (this.role === 'BUSINESS') {
+          this.detailsForm.patchValue({
+            businessName: data.businessName || '',
+            location: data.location || '',
+            contactNumber: data.contactNumber || '',
+            businessType: data.businessType || ''
+          });
+        } else if (this.role === 'DRIVER') {
+          this.detailsForm.patchValue({
+            licenseNumber: data.licenseNumber || '',
+            vehicleType: data.vehicleType || '',
+            vehicleNumber: data.vehicleNumber || '',
+            contactNumber: data.contactNumber || '',
+            location: data.location || ''
+          });
+          this.verificationStatus = data.verificationStatus || 'PENDING';
+          this.rejectionReason = data.rejectionReason || '';
+          this.isAvailable = data.available || false;
+        } else if (this.role === 'CUSTOMER') {
+          this.detailsForm.patchValue({
+            contactNumber: data.contactNumber || '',
+            alternativeContactNumber: data.alternativeContactNumber || '',
+            address: data.address || '',
+            location: data.location || '' // ADDED
+          });
+        }
+        
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load details:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
   onFileChange(event: any, type: string) {
     const file = event.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        Swal.fire('File Too Large', 'Please upload a file smaller than 5MB', 'warning');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = () => {
         const base64 = reader.result as string;
@@ -102,16 +153,28 @@ export class ProfileSettingsComponent implements OnInit {
   onSubmit() {
     if (this.detailsForm.invalid) {
       this.detailsForm.markAllAsTouched();
-      Swal.fire('Incomplete Form', 'Please fill all required fields', 'warning');
-      return;
-    }
+      
+      // Show specific validation errors
+      const errors: string[] = [];
+      Object.keys(this.detailsForm.controls).forEach(key => {
+        const control = this.detailsForm.get(key);
+        if (control?.invalid) {
+          if (control.errors?.['required']) {
+            errors.push(`${this.formatFieldName(key)} is required`);
+          }
+          if (control.errors?.['pattern']) {
+            errors.push(`${this.formatFieldName(key)} is invalid`);
+          }
+        }
+      });
 
-    // Driver validation
-    if (this.role === 'DRIVER' && !this.detailsCompleted) {
-      if (!this.licenseProofBase64 || !this.vehicleRcBase64) {
-        Swal.fire('Missing Documents', 'Please upload both License Proof and Vehicle RC', 'warning');
-        return;
-      }
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Form',
+        html: errors.join('<br>'),
+        confirmButtonColor: '#3085d6'
+      });
+      return;
     }
 
     this.isSubmitting = true;
@@ -121,9 +184,14 @@ export class ProfileSettingsComponent implements OnInit {
       ...this.detailsForm.value
     };
 
-    if (this.role === 'DRIVER' && !this.detailsCompleted) {
-      payload['licenseProof'] = this.licenseProofBase64;
-      payload['vehicleRc'] = this.vehicleRcBase64;
+    // Only include files if they were uploaded (for updates)
+    if (this.role === 'DRIVER') {
+      if (this.licenseProofBase64) {
+        payload['licenseProof'] = this.licenseProofBase64;
+      }
+      if (this.vehicleRcBase64) {
+        payload['vehicleRc'] = this.vehicleRcBase64;
+      }
     }
 
     let submitObservable;
@@ -145,14 +213,50 @@ export class ProfileSettingsComponent implements OnInit {
           showConfirmButton: false
         }).then(() => {
           this.detailsCompleted = true;
-          this.router.navigate(['/dashboard']);
+          if (this.role === 'DRIVER') {
+            this.verificationStatus = 'PENDING';
+          }
+          this.loadExistingDetails();
         });
         this.isSubmitting = false;
       },
       error: (err) => {
-        Swal.fire('Update Failed', err.error?.message || 'Please try again', 'error');
+        console.error('Update error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Update Failed',
+          text: err.error?.message || 'Please try again',
+          confirmButtonColor: '#d33'
+        });
         this.isSubmitting = false;
       }
     });
+  }
+
+  toggleAvailability() {
+    if (this.role !== 'DRIVER') return;
+
+    this.httpService.toggleDriverAvailability(this.username).subscribe({
+      next: (res: any) => {
+        this.isAvailable = res.isAvailable;
+        Swal.fire({
+          icon: 'success',
+          title: 'Availability Updated',
+          text: `You are now ${this.isAvailable ? 'available' : 'unavailable'} for assignments`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      error: () => {
+        Swal.fire('Error', 'Failed to update availability', 'error');
+      }
+    });
+  }
+
+  private formatFieldName(field: string): string {
+    return field
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/^./, str => str.toUpperCase())
+      .trim();
   }
 }

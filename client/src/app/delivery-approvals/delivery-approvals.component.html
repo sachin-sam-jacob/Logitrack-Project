@@ -1,0 +1,117 @@
+<div class="approval-container">
+  
+  <div class="page-header">
+    <h2>✅ Delivery Proof Approvals</h2>
+    <p>Review and approve delivery proofs submitted by drivers</p>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="pendingCargos.length === 0" class="empty-state">
+    <span class="empty-icon">📋</span>
+    <h3>No Pending Approvals</h3>
+    <p>All deliveries have been reviewed</p>
+  </div>
+
+  <!-- PENDING CARGOS GRID -->
+  <div class="cargo-grid" *ngIf="pendingCargos.length > 0">
+    
+    <div class="cargo-card" *ngFor="let cargo of pendingCargos">
+      
+      <div class="cargo-header">
+        <h3>#{{ cargo.id }} - {{ cargo.content }}</h3>
+        <span class="status-badge awaiting">Awaiting Approval</span>
+      </div>
+
+      <div class="cargo-details">
+        <div class="detail-row">
+          <span class="label">📦 Size:</span>
+          <span class="value">{{ cargo.size }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">📍 Route:</span>
+          <span class="value">{{ cargo.sourceLocation }} → {{ cargo.destinationLocation }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">👤 Customer:</span>
+          <span class="value">{{ cargo.customerName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">🚚 Driver:</span>
+          <span class="value">{{ cargo.driver?.name || 'N/A' }}</span>
+        </div>
+        <div class="detail-row" *ngIf="cargo.deliveryNotes">
+          <span class="label">📝 Notes:</span>
+          <span class="value">{{ cargo.deliveryNotes }}</span>
+        </div>
+      </div>
+
+      <div class="cargo-actions">
+        <button class="btn btn-view" (click)="viewProof(cargo)">
+          👁️ View Proof
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h2>Delivery Proof - Cargo #{{ selectedCargo?.id }}</h2>
+      <button class="close-btn" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      
+      <div class="proof-section">
+        <h3>📷 Delivery Proof Image</h3>
+        <div class="proof-viewer" *ngIf="selectedCargo?.deliveryProofUrl">
+          <img 
+            [src]="selectedCargo.deliveryProofUrl" 
+            alt="Delivery Proof"
+          />
+        </div>
+        <p *ngIf="!selectedCargo?.deliveryProofUrl" class="no-proof">
+          No delivery proof uploaded
+        </p>
+      </div>
+
+      <div class="cargo-info">
+        <div class="info-item">
+          <span class="info-label">Cargo Content:</span>
+          <span class="info-value">{{ selectedCargo?.content }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Customer:</span>
+          <span class="info-value">{{ selectedCargo?.customerName }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Delivery Address:</span>
+          <span class="info-value">{{ selectedCargo?.customerAddress }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Driver:</span>
+          <span class="info-value">{{ selectedCargo?.driver?.name }}</span>
+        </div>
+        <div class="info-item" *ngIf="selectedCargo?.deliveryNotes">
+          <span class="info-label">Delivery Notes:</span>
+          <span class="info-value">{{ selectedCargo?.deliveryNotes }}</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-approve" (click)="approveDelivery()">
+        ✅ Approve Delivery
+      </button>
+      <button class="btn btn-reject" (click)="rejectDelivery()">
+        ❌ Reject Proof
+      </button>
+    </div>
+
+  </div>
+</div>

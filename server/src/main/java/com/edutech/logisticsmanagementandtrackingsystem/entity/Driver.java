@@ -1,11 +1,7 @@
 package com.edutech.logisticsmanagementandtrackingsystem.entity;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import javax.persistence.*;
-import java.util.List;
- 
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
@@ -21,24 +17,38 @@ public class Driver {
     @Column(name="email")
     private String email;
     
-    // NEW FIELDS
     @Column(name="license_number")
     private String licenseNumber;
     
     @Column(name="vehicle_type")
-    private String vehicleType; 
+    private String vehicleType;
     
     @Column(name="vehicle_number")
     private String vehicleNumber;
     
     @Column(name="license_proof_url", length = 500)
-    private String licenseProofUrl; 
+    private String licenseProofUrl;
     
     @Column(name="vehicle_rc_url", length = 500)
-    private String vehicleRcUrl; 
+    private String vehicleRcUrl;
     
     @Column(name="contact_number")
     private String contactNumber;
+    
+    @Column(name="base_location") // Original registration location
+    private String baseLocation;
+    
+    @Column(name="current_location") // Updated after each delivery
+    private String currentLocation;
+    
+    @Column(name="is_available", nullable = false)
+    private boolean isAvailable = false; // Default to false until approved
+    
+    @Column(name="verification_status")
+    private String verificationStatus = "PENDING";
+    
+    @Column(name="rejection_reason")
+    private String rejectionReason;
     
     @Column(name="details_completed", nullable = false)
     private boolean detailsCompleted = false;
@@ -47,7 +57,6 @@ public class Driver {
     @JsonIgnore
     private List<Cargo> assignedCargos;
 
-    // Constructors
     public Driver() {
     }
 
@@ -136,6 +145,46 @@ public class Driver {
 
     public void setContactNumber(String contactNumber) {
         this.contactNumber = contactNumber;
+    }
+
+    public String getBaseLocation() {
+        return baseLocation;
+    }
+
+    public void setBaseLocation(String baseLocation) {
+        this.baseLocation = baseLocation;
+    }
+
+    public String getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 
     public boolean isDetailsCompleted() {

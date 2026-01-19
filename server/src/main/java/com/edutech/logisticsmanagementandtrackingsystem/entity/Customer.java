@@ -1,5 +1,6 @@
 package com.edutech.logisticsmanagementandtrackingsystem.entity;
 import javax.persistence.*;
+
 @Entity
 public class Customer {
 
@@ -13,7 +14,6 @@ public class Customer {
     @Column(name="email")
     private String email;
     
-    // NEW FIELDS
     @Column(name="contact_number")
     private String contactNumber;
     
@@ -23,10 +23,12 @@ public class Customer {
     @Column(name="address")
     private String address;
     
+    @Column(name="location") // ADDED - Fixed missing field
+    private String location;
+    
     @Column(name="details_completed", nullable = false)
     private boolean detailsCompleted = false;
  
-    // Constructors
     public Customer(String name, String email) {
         this.name = name;
         this.email = email;
@@ -35,7 +37,6 @@ public class Customer {
     public Customer() {
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -82,6 +83,14 @@ public class Customer {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public boolean isDetailsCompleted() {

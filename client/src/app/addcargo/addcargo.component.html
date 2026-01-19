@@ -2,94 +2,130 @@
 
   <!-- HEADER -->
   <div class="page-header">
-    <h2>Add Cargo</h2>
-    <p>Manage cargo details and assign drivers</p>
+    <h2>📦 Add Cargo</h2>
+    <p>Create cargo and assign to available drivers</p>
   </div>
 
-  <!-- ADD CARGO -->
+  <!-- ADD CARGO FORM -->
   <div class="card">
-    <h3>New Cargo</h3>
+    <h3>New Cargo Details</h3>
 
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="form-grid">
 
       <div class="form-group">
-        <label>Cargo Content</label>
-        <input type="text" formControlName="content" placeholder="Electronics" />
-        <small *ngIf="itemForm.get('content')?.touched && itemForm.get('content')?.invalid">
+        <label>Cargo Content <span class="required">*</span></label>
+        <input type="text" formControlName="content" placeholder="e.g., Electronics, Furniture" />
+        <small *ngIf="itemForm.get('content')?.touched && itemForm.get('content')?.invalid" class="error">
           Required
         </small>
       </div>
 
       <div class="form-group">
-        <label>Size</label>
-        <input type="text" formControlName="size" placeholder="Small / Medium / Large" />
-        <small *ngIf="itemForm.get('size')?.touched && itemForm.get('size')?.invalid">
-          Required
-        </small>
-      </div>
-
-      <div class="form-group">
-        <label>Status</label>
-        <select formControlName="status">
-          <option value="">Select status</option>
-          <option value="CREATED">Created</option>
-          <!-- <option value="IN_TRANSIT">In Transit</option>
-          <option value="DELIVERED">Delivered</option> -->
+        <label>Size <span class="required">*</span></label>
+        <select formControlName="size">
+          <option value="">Select Size</option>
+          <option value="Small">Small</option>
+          <option value="Medium">Medium</option>
+          <option value="Large">Large</option>
+          <option value="Extra Large">Extra Large</option>
         </select>
-        <small *ngIf="itemForm.get('status')?.touched && itemForm.get('status')?.invalid">
+        <small *ngIf="itemForm.get('size')?.touched && itemForm.get('size')?.invalid" class="error">
           Required
         </small>
       </div>
 
-      <div class="form-actions">
-        <button type="submit" [disabled]="itemForm.invalid">Add Cargo</button>
+      <div class="form-group">
+        <label>Source Location <span class="required">*</span></label>
+        <input type="text" formControlName="sourceLocation" placeholder="e.g., Chennai, Tamil Nadu" />
+        <small *ngIf="itemForm.get('sourceLocation')?.touched && itemForm.get('sourceLocation')?.invalid" class="error">
+          Required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Destination Location <span class="required">*</span></label>
+        <input type="text" formControlName="destinationLocation" placeholder="e.g., Mumbai, Maharashtra" />
+        <small *ngIf="itemForm.get('destinationLocation')?.touched && itemForm.get('destinationLocation')?.invalid" class="error">
+          Required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Customer Name <span class="required">*</span></label>
+        <input type="text" formControlName="customerName" placeholder="Customer full name" />
+        <small *ngIf="itemForm.get('customerName')?.touched && itemForm.get('customerName')?.invalid" class="error">
+          Required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Customer Contact <span class="required">*</span></label>
+        <input type="tel" formControlName="customerContact" placeholder="10-digit number" maxlength="10" />
+        <small *ngIf="itemForm.get('customerContact')?.touched && itemForm.get('customerContact')?.invalid" class="error">
+          Valid 10-digit number required
+        </small>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Customer Address <span class="required">*</span></label>
+        <textarea formControlName="customerAddress" rows="2" placeholder="Full delivery address"></textarea>
+        <small *ngIf="itemForm.get('customerAddress')?.touched && itemForm.get('customerAddress')?.invalid" class="error">
+          Required
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label>Estimated Delivery Date</label>
+        <input type="datetime-local" formControlName="estimatedDeliveryDate" />
+      </div>
+
+      <div class="form-actions full-width">
+        <button type="submit" [disabled]="itemForm.invalid" class="btn-primary">
+          ✅ Create Cargo
+        </button>
       </div>
     </form>
   </div>
 
   <!-- ASSIGN DRIVER -->
   <div class="card">
-    <h3>Assign Driver</h3>
+    <h3>🚚 Assign Driver to Cargo</h3>
 
     <div class="form-grid">
 
       <div class="form-group">
         <label>Select Cargo</label>
         <select (change)="selectCargo($event)">
-          <option value="">Select cargo</option>
-          <option *ngFor="let c of cargList" [value]="c.id">
-            {{ c.content }} ({{ c.status }})
+          <option value="">Choose cargo to assign</option>
+          <option *ngFor="let c of cargList" [value]="c.id" [disabled]="c.status !== 'CREATED'">
+            #{{ c.id }} - {{ c.content }} | {{ c.sourceLocation }} → {{ c.destinationLocation }}
+            <span *ngIf="c.status !== 'CREATED'">({{ c.status }})</span>
           </option>
         </select>
       </div>
 
-      <div class="form-group">
-        <label>Select Driver</label>
+      <div class="form-group" *ngIf="selectedCargoId">
+        <label>Available Drivers at {{ selectedCargoSourceLocation }}</label>
         <select (change)="selectDriver($event)">
           <option value="">Select driver</option>
-          <option *ngFor="let d of driverList" [value]="d.id">
-            {{ d.name }}
+          <option *ngFor="let d of filteredDriverList" [value]="d.id">
+            {{ d.name }} - {{ d.vehicleType }} ({{ d.vehicleNumber }})
           </option>
         </select>
+        <small *ngIf="filteredDriverList.length === 0" class="info-text">
+          ℹ️ No drivers available at this location
+        </small>
       </div>
 
-      <div class="form-actions">
+      <div class="form-actions full-width">
         <button
           (click)="assignDriver()"
-          [disabled]="!assignModel.cargoId || !assignModel.driverId">
-          Assign Driver
+          [disabled]="!selectedCargoId || !selectedDriverId"
+          class="btn-success">
+          🚀 Assign Driver
         </button>
       </div>
     </div>
-  </div>
-
-  <!-- ALERTS -->
-  <div *ngIf="showMessage" class="alert success">
-    {{ responseMessage }}
-  </div>
-
-  <div *ngIf="showError" class="alert error">
-    {{ errorMessage }}
   </div>
 
 </div>

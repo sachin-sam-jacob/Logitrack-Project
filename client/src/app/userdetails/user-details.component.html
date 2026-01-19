@@ -57,7 +57,7 @@
         </button>
       </div>
     </form>
-
+    
     <!-- DRIVER FORM -->
     <form *ngIf="role === 'DRIVER'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
       
@@ -100,6 +100,14 @@
       </div>
 
       <div class="input-group">
+        <label>Location <span class="required">*</span></label>
+        <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
+        <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
+          Location is required
+        </small>
+      </div>
+
+      <div class="input-group">
         <label>Upload License Proof <span class="required">*</span></label>
         <div class="file-upload">
           <input type="file" (change)="onFileChange($event, 'license')" accept="image/*,.pdf" id="license" />
@@ -129,7 +137,7 @@
       </div>
     </form>
 
-    <!-- CUSTOMER FORM -->
+    <!-- CUSTOMER FORM - FIXED -->
     <form *ngIf="role === 'CUSTOMER'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
       
       <div class="input-group">
@@ -153,6 +161,15 @@
         <textarea formControlName="address" rows="3" placeholder="Enter your full address"></textarea>
         <small class="error" *ngIf="detailsForm.get('address')?.invalid && detailsForm.get('address')?.touched">
           Address is required
+        </small>
+      </div>
+
+      <!-- ADDED LOCATION FIELD -->
+      <div class="input-group">
+        <label>Location <span class="required">*</span></label>
+        <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
+        <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
+          Location is required
         </small>
       </div>
 
