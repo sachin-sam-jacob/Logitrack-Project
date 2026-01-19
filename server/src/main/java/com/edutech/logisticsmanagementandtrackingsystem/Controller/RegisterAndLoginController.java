@@ -102,7 +102,9 @@ public class RegisterAndLoginController {
             user.setEmailVerified(true);  
             userService.updateUser(user);  
 
-            // Create role-based entity ONLY ONCE  
+             String purpose = request.getPurpose();
+
+if (purpose == null || purpose.equalsIgnoreCase("REGISTER")) {
             if (user.getRole().equals("BUSINESS")) {  
                 Business business = new Business();  
                 business.setName(user.getUsername());  
@@ -113,12 +115,13 @@ public class RegisterAndLoginController {
                 customer.setName(user.getUsername());  
                 customer.setEmail(user.getEmail());  
                 customerService.createCustomer(customer);  
-            } else if (user.getRole().equals("DRIVER")) {  
+            } else {  
                 Driver driver = new Driver();  
                 driver.setName(user.getUsername());  
                 driver.setEmail(user.getEmail());  
                 driverService.createDriver(driver);  
             }  
+        }
 
             Map<String, String> success = new HashMap<>();  
             success.put("message", "Email verified successfully");  

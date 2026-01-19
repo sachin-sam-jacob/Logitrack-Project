@@ -216,4 +216,34 @@ export class HttpService {
       headers: this.getHeaders()
     });
   }
+   // ==================== FORGOT PASSWORD ====================
+   checkEmailExists(email: string): Observable<{ exists: boolean }> {
+  let headers = new HttpHeaders().set('Content-Type', 'application/json');
+  return this.http.post<{ exists: boolean }>(
+    `${this.serverName}/api/forgot-password/check`,
+    { email },
+    { headers }
+  );
+}
+
+
+requestPasswordReset(email: string) {
+  const headers = new HttpHeaders().set('Content-Type', 'application/json');
+  // Expecting response: { message: string, username?: string }
+  return this.http.post<{ message: string; username?: string }>(
+    `${this.serverName}/api/forgot-password/request`,
+    { email },
+    { headers }
+  );
+}
+
+resetPassword(payload: { username: string; newPassword: string }) {
+  const headers = new HttpHeaders().set('Content-Type', 'application/json');
+  return this.http.post(
+    `${this.serverName}/api/forgot-password/reset`,
+    payload,
+    { headers }
+  );
+}
+
 }

@@ -20,6 +20,8 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { HttpService } from '../services/http.service';
 import { AdminGuard } from './guards/admin.guard';
 import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+
 
 @NgModule({
   declarations: [
@@ -35,7 +37,8 @@ import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approv
     UserDetailsComponent,
     ProfileSettingsComponent,
     AdminDashboardComponent,
-    DeliveryApprovalsComponent
+    DeliveryApprovalsComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     BrowserModule,

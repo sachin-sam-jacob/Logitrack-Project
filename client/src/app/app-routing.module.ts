@@ -13,11 +13,15 @@ import { ProfileSettingsComponent } from './profile-settings/profile-settings.co
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { AdminGuard } from './guards/admin.guard';
 import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+
 
 const routes: Routes = [
   { path: '', component: WelcomePageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'registration', component: RegistrationComponent },
+  //forgot-password
+  { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'user-details', component: UserDetailsComponent },
   
   // Admin Dashboard (Protected)
@@ -45,7 +49,8 @@ const routes: Routes = [
   { path: 'addcargo', component: AddcargoComponent },
   { path: 'asgin-cargo', component: AssginCargoComponent },
   { path: 'viewcargostatus', component: ViewcargostatusComponent },
-  { path: '**', redirectTo: '', pathMatch: 'full' }
+  { path: '**', redirectTo: '', pathMatch: 'full' },
+
 ];
 
 @NgModule({

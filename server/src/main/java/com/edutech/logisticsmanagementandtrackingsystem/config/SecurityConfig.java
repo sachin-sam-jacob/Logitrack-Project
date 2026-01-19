@@ -45,6 +45,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
+                //forgot-password endpoints
+                .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/forgot-password/check").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/forgot-password/request").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/forgot-password/reset").permitAll()
                 // Public endpoints
                 .antMatchers(HttpMethod.POST, "/api/register").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/login").permitAll()

@@ -3,6 +3,13 @@ package com.edutech.logisticsmanagementandtrackingsystem.dto;
 public class OtpRequest {
     private String username;
     private String otp;
+    private String purpose;
+    public String getPurpose() {
+        return purpose;
+    }
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
     public String getUsername() {
         return username;
     }
