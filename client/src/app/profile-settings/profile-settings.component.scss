@@ -244,3 +244,46 @@
     transform: translateX(26px);
   }
 }
+
+
+.location-card {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 8px;
+  background: #f8f9fa;
+  
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2c3e50;
+  }
+}
+
+.location-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.location-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e2e8f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .label {
+    color: #64748b;
+    font-weight: 500;
+    font-size: 13px;
+  }
+  
+  .value {
+    color: #0f172a;
+    font-weight: 600;
+    font-size: 13px;
+  }
+}

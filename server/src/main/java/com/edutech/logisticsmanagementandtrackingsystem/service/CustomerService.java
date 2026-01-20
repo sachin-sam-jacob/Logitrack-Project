@@ -12,6 +12,9 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CustomerRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
  
 @Service
 public class CustomerService {
@@ -24,6 +27,9 @@ public class CustomerService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private EmailService emailService;
  
     public Customer createCustomer(Customer customer) {
         return customerRepository.save(customer);
@@ -46,6 +52,62 @@ public class CustomerService {
         );
     }
 
+    public List<Cargo> getCargosByCustomerEmail(String email) {
+        return cargoRepository.findAll().stream()
+                .filter(c -> email.equalsIgnoreCase(c.getCustomerEmail()))
+                .collect(Collectors.toList());
+    }
+
+    public List<Cargo> searchCustomerCargos(String email, String keyword) {
+        if (email == null || email.trim().isEmpty()) {
+            return cargoRepository.findAll().stream()
+                    .filter(c -> {
+                        String lowerKeyword = keyword.toLowerCase();
+                        return (c.getTrackingNumber() != null && c.getTrackingNumber().toLowerCase().contains(lowerKeyword));
+                    })
+                    .collect(Collectors.toList());
+        }
+        
+        return cargoRepository.findAll().stream()
+                .filter(c -> email.equalsIgnoreCase(c.getCustomerEmail()))
+                .filter(c -> {
+                    String lowerKeyword = keyword.toLowerCase();
+                    return (c.getTrackingNumber() != null && c.getTrackingNumber().toLowerCase().contains(lowerKeyword)) ||
+                           (c.getContent() != null && c.getContent().toLowerCase().contains(lowerKeyword)) ||
+                           (c.getStatus() != null && c.getStatus().toLowerCase().contains(lowerKeyword));
+                })
+                .collect(Collectors.toList());
+    }
+
+    public Cargo getCargoByTrackingNumber(String trackingNumber) {
+        return cargoRepository.findByTrackingNumber(trackingNumber)
+                .orElseThrow(() -> new EntityNotFoundException("Cargo not found with tracking number: " + trackingNumber));
+    }
+
+    /**
+     * UPDATED: Verify delivery OTP and notify business
+     */
+    public boolean verifyDeliveryOtp(Long cargoId, String otp) {
+        Cargo cargo = cargoRepository.findById(cargoId)
+                .orElseThrow(() -> new EntityNotFoundException("Cargo not found"));
+
+        if (cargo.getDeliveryOtp() != null && cargo.getDeliveryOtp().equals(otp)) {
+            cargo.setOtpVerified(true);
+            cargo.setStatus("DELIVERED");
+            cargoRepository.save(cargo);
+            
+            // ADDED: Send delivery completion email to business
+            try {
+                emailService.sendDeliveryCompletionToBusiness(cargo);
+            } catch (Exception e) {
+                System.err.println("Failed to send delivery completion email to business: " + e.getMessage());
+            }
+            
+            return true;
+        }
+        return false;
+    }
+
     public Customer updateCustomerDetails(CustomerDetailsRequest request) {
         User user = userRepository.findByUsername(request.getUsername());
         if (user == null) {
@@ -60,7 +122,7 @@ public class CustomerService {
         customer.setContactNumber(request.getContactNumber());
         customer.setAlternativeContactNumber(request.getAlternativeContactNumber());
         customer.setAddress(request.getAddress());
-        customer.setLocation(request.getLocation()); // ADDED
+        customer.setLocation(request.getLocation());
         customer.setDetailsCompleted(true);
 
         return customerRepository.save(customer);

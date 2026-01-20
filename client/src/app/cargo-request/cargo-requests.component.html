@@ -1,0 +1,119 @@
+<div class="requests-container">
+
+  <div class="page-header">
+    <h2>📬 Cargo Requests</h2>
+    <p>Accept or reject cargo assignments</p>
+  </div>
+
+  <div class="alert error" *ngIf="showError">
+    {{ errorMessage }}
+  </div>
+
+  <div class="alert success" *ngIf="showSuccess">
+    {{ successMessage }}
+  </div>
+
+  <div class="requests-list" *ngIf="!isLoading && pendingRequests.length > 0">
+    <div class="request-card" *ngFor="let cargo of pendingRequests">
+      <div class="card-header">
+        <div class="tracking-info">
+          <span class="tracking-label">Tracking #</span>
+          <span class="tracking-number">{{ cargo.trackingNumber }}</span>
+        </div>
+        <span class="status-badge pending">PENDING</span>
+      </div>
+
+      <div class="cargo-details">
+        <div class="detail-group">
+          <h4>📦 Cargo Information</h4>
+          <div class="detail-item">
+            <span class="label">Content:</span>
+            <span class="value">{{ cargo.content }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Size:</span>
+            <span class="value">{{ cargo.size }}</span>
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <h4>📍 Locations</h4>
+          <div class="detail-item">
+            <span class="label">Pickup:</span>
+            <span class="value">{{ cargo.sourceLocation }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Delivery:</span>
+            <span class="value">{{ cargo.destinationLocation }}</span>
+          </div>
+        </div>
+
+        <div class="detail-group">
+          <h4>👤 Customer Details</h4>
+          <div class="detail-item">
+            <span class="label">Name:</span>
+            <span class="value">{{ cargo.customerName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Contact:</span>
+            <span class="value">{{ cargo.customerContact }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Address:</span>
+            <span class="value">{{ cargo.customerAddress }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button 
+          class="btn accept-btn" 
+          (click)="acceptCargo(cargo.id)"
+          [disabled]="isProcessing">
+          ✅ Accept
+        </button>
+        <button 
+          class="btn reject-btn" 
+          (click)="openRejectDialog(cargo)"
+          [disabled]="isProcessing">
+          ❌ Reject
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && pendingRequests.length === 0">
+    <p>📭 No pending cargo requests</p>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <p>Loading requests...</p>
+  </div>
+
+</div>
+
+<!-- Reject Dialog -->
+<div class="modal-overlay" *ngIf="showRejectDialog" (click)="closeRejectDialog()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h3>Reject Cargo Assignment</h3>
+    <p>Please provide a reason for rejecting this cargo:</p>
+    
+    <textarea 
+      [(ngModel)]="rejectionReason" 
+      placeholder="Enter reason for rejection..."
+      rows="4">
+    </textarea>
+
+    <div class="modal-actions">
+      <button class="btn secondary-btn" (click)="closeRejectDialog()">
+        Cancel
+      </button>
+      <button 
+        class="btn reject-btn" 
+        (click)="confirmReject()"
+        [disabled]="!rejectionReason || isProcessing">
+        Confirm Reject
+      </button>
+    </div>
+  </div>
+</div>

@@ -14,7 +14,9 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { AdminGuard } from './guards/admin.guard';
 import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
-
+import { CustomerTrackCargoComponent } from './customer-track-cargo/customer-track-cargo.component';
+import { ViewDriversComponent } from './view-drivers/view-drivers.component';
+import { CargoRequestsComponent } from './cargo-request/cargo-requests.component';
 
 const routes: Routes = [
   { path: '', component: WelcomePageComponent },
@@ -39,10 +41,13 @@ const routes: Routes = [
       { path: 'home', component: DashbaordComponent },
       { path: 'add-cargo', component: AddcargoComponent },
       { path: 'assign-cargo', component: AssginCargoComponent },
-      { path: 'view-cargo', component: ViewcargostatusComponent },
+      { path: 'view-cargo', component: CustomerTrackCargoComponent }, // UPDATED
       { path: 'view-business-cargo', component: Viewbusinesscargo },
       { path: 'delivery-approvals', component: DeliveryApprovalsComponent }, // NEW
-      { path: 'profile', component: ProfileSettingsComponent }
+      { path: 'profile', component: ProfileSettingsComponent },
+      { path: 'drivers', component: ViewDriversComponent }, // NEW
+      { path: 'cargo-requests', component: CargoRequestsComponent }, // NEW
+      { path: 'update-status', component: AssginCargoComponent }
     ]
   },
   

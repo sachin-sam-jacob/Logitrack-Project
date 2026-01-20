@@ -2,7 +2,6 @@ package com.edutech.logisticsmanagementandtrackingsystem.dto;
 
 import java.time.LocalDateTime;
 
-// DTO for creating cargo
 public class CreateCargoRequest {
     private String content;
     private String size;
@@ -10,6 +9,7 @@ public class CreateCargoRequest {
     private String destinationLocation;
     private String customerName;
     private String customerContact;
+    private String customerEmail; // NEW
     private String customerAddress;
     private LocalDateTime estimatedDeliveryDate;
 
@@ -60,6 +60,14 @@ public class CreateCargoRequest {
 
     public void setCustomerContact(String customerContact) {
         this.customerContact = customerContact;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
     }
 
     public String getCustomerAddress() {

@@ -18,7 +18,7 @@ public class Cargo {
     private String size;
     
     @Column(name="status")
-    private String status; // CREATED, ASSIGNED, PICKED_UP, IN_TRANSIT, DELIVERED, CANCELLED
+    private String status; // CREATED, ASSIGNED, ACCEPTED, REJECTED, PICKED_UP, IN_TRANSIT, AWAITING_OTP, DELIVERED, CANCELLED
     
     @Column(name="source_location", nullable = false)
     private String sourceLocation;
@@ -32,8 +32,17 @@ public class Cargo {
     @Column(name="customer_contact")
     private String customerContact;
     
+    @Column(name="customer_email")
+    private String customerEmail;
+    
     @Column(name="customer_address")
     private String customerAddress;
+    
+    @Column(name="tracking_number", unique = true)
+    private String trackingNumber;
+    
+    @Column(name="rejection_reason")
+    private String rejectionReason;
     
     @Column(name="delivery_proof_url", length = 500)
     private String deliveryProofUrl;
@@ -43,6 +52,12 @@ public class Cargo {
     
     @Column(name="delivery_notes", length = 1000)
     private String deliveryNotes;
+    
+    @Column(name="delivery_otp")
+    private String deliveryOtp;
+    
+    @Column(name="otp_verified")
+    private boolean otpVerified = false;
     
     @Column(name="estimated_delivery_date")
     private LocalDateTime estimatedDeliveryDate;
@@ -68,11 +83,18 @@ public class Cargo {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (trackingNumber == null) {
+            trackingNumber = generateTrackingNumber();
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    private String generateTrackingNumber() {
+        return "LT" + System.currentTimeMillis() + (int)(Math.random() * 1000);
     }
 
     // Constructors
@@ -153,12 +175,36 @@ public class Cargo {
         this.customerContact = customerContact;
     }
 
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public void setCustomerEmail(String customerEmail) {
+        this.customerEmail = customerEmail;
+    }
+
     public String getCustomerAddress() {
         return customerAddress;
     }
 
     public void setCustomerAddress(String customerAddress) {
         this.customerAddress = customerAddress;
+    }
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public String getRejectionReason() {
+        return rejectionReason;
+    }
+
+    public void setRejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
     }
 
     public String getDeliveryProofUrl() {
@@ -183,6 +229,22 @@ public class Cargo {
 
     public void setDeliveryNotes(String deliveryNotes) {
         this.deliveryNotes = deliveryNotes;
+    }
+
+    public String getDeliveryOtp() {
+        return deliveryOtp;
+    }
+
+    public void setDeliveryOtp(String deliveryOtp) {
+        this.deliveryOtp = deliveryOtp;
+    }
+
+    public boolean isOtpVerified() {
+        return otpVerified;
+    }
+
+    public void setOtpVerified(boolean otpVerified) {
+        this.otpVerified = otpVerified;
     }
 
     public LocalDateTime getEstimatedDeliveryDate() {

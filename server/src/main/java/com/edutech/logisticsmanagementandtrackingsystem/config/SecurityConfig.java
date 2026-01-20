@@ -77,13 +77,27 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/business/assign-cargo").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/my-cargos").hasAuthority("BUSINESS")
                 .antMatchers(HttpMethod.GET, "/api/business/search-cargo").hasAuthority("BUSINESS")
+                .antMatchers(HttpMethod.GET, "/api/business/available-drivers").hasAuthority("BUSINESS")
+                .antMatchers(HttpMethod.POST, "/api/business/approve-delivery").hasAuthority("BUSINESS")
+                .antMatchers(HttpMethod.GET, "/api/business/pending-approvals").hasAuthority("BUSINESS")
                 
                 // Driver endpoints
                 .antMatchers(HttpMethod.GET, "/api/driver/cargo").hasAuthority("DRIVER")
+                .antMatchers(HttpMethod.GET, "/api/driver/pending-requests").hasAuthority("DRIVER")
+                .antMatchers(HttpMethod.POST, "/api/driver/accept-cargo").hasAuthority("DRIVER")
+                .antMatchers(HttpMethod.POST, "/api/driver/reject-cargo").hasAuthority("DRIVER")
                 .antMatchers(HttpMethod.PUT, "/api/driver/update-cargo-status").hasAuthority("DRIVER")
+                .antMatchers(HttpMethod.PUT, "/api/driver/update-status").hasAuthority("DRIVER")
+                .antMatchers(HttpMethod.GET, "/api/driver/verification-status").hasAuthority("DRIVER")
+                .antMatchers(HttpMethod.POST, "/api/driver/verify-delivery-otp").hasAuthority("DRIVER")
+
                 
                 // Customer endpoints
                 .antMatchers(HttpMethod.GET, "/api/customer/cargo-status").hasAuthority("CUSTOMER")
+                .antMatchers(HttpMethod.GET, "/api/customer/my-cargos").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/customer/search-cargo").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/customer/track-by-number").permitAll() // NEW
+                .antMatchers(HttpMethod.POST, "/api/customer/verify-delivery-otp").permitAll() // NEW
                 
                 .anyRequest().authenticated()
                 .and()

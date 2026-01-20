@@ -25,10 +25,12 @@ export class ProfileSettingsComponent implements OnInit {
   licenseProofName: string = '';
   vehicleRcName: string = '';
 
-  // Driver status
+  // Driver status - ADDED missing fields
   verificationStatus: string = '';
   rejectionReason: string = '';
-  isAvailable: boolean = true;
+  isAvailable: boolean = false;
+  baseLocation: string = '';
+  currentLocation: string = '';
 
   constructor(
     private fb: FormBuilder,
@@ -71,7 +73,7 @@ export class ProfileSettingsComponent implements OnInit {
         contactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
         alternativeContactNumber: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
         address: ['', Validators.required],
-        location: ['', Validators.required] // ADDED
+        location: ['', Validators.required]
       });
     }
   }
@@ -104,17 +106,28 @@ export class ProfileSettingsComponent implements OnInit {
             vehicleType: data.vehicleType || '',
             vehicleNumber: data.vehicleNumber || '',
             contactNumber: data.contactNumber || '',
-            location: data.location || ''
+            location: data.baseLocation || data.location || ''
           });
+          
+          // FIXED: Properly set all driver fields
           this.verificationStatus = data.verificationStatus || 'PENDING';
           this.rejectionReason = data.rejectionReason || '';
           this.isAvailable = data.available || false;
+          this.baseLocation = data.baseLocation || '';
+          this.currentLocation = data.currentLocation || data.baseLocation || '';
+          
+          console.log('Driver details loaded:', {
+            verificationStatus: this.verificationStatus,
+            isAvailable: this.isAvailable,
+            baseLocation: this.baseLocation,
+            currentLocation: this.currentLocation
+          });
         } else if (this.role === 'CUSTOMER') {
           this.detailsForm.patchValue({
             contactNumber: data.contactNumber || '',
             alternativeContactNumber: data.alternativeContactNumber || '',
             address: data.address || '',
-            location: data.location || '' // ADDED
+            location: data.location || ''
           });
         }
         
@@ -154,7 +167,6 @@ export class ProfileSettingsComponent implements OnInit {
     if (this.detailsForm.invalid) {
       this.detailsForm.markAllAsTouched();
       
-      // Show specific validation errors
       const errors: string[] = [];
       Object.keys(this.detailsForm.controls).forEach(key => {
         const control = this.detailsForm.get(key);
@@ -184,7 +196,6 @@ export class ProfileSettingsComponent implements OnInit {
       ...this.detailsForm.value
     };
 
-    // Only include files if they were uploaded (for updates)
     if (this.role === 'DRIVER') {
       if (this.licenseProofBase64) {
         payload['licenseProof'] = this.licenseProofBase64;
@@ -234,11 +245,28 @@ export class ProfileSettingsComponent implements OnInit {
   }
 
   toggleAvailability() {
-    if (this.role !== 'DRIVER') return;
+    if (this.role !== 'DRIVER') {
+      console.error('Toggle availability called for non-driver role');
+      return;
+    }
+
+    if (this.verificationStatus !== 'APPROVED') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Not Approved',
+        text: 'Only approved drivers can change availability',
+        confirmButtonColor: '#f59e0b'
+      });
+      return;
+    }
+
+    console.log('Toggling availability for:', this.username);
 
     this.httpService.toggleDriverAvailability(this.username).subscribe({
       next: (res: any) => {
         this.isAvailable = res.isAvailable;
+        console.log('Availability toggled to:', this.isAvailable);
+        
         Swal.fire({
           icon: 'success',
           title: 'Availability Updated',
@@ -247,8 +275,14 @@ export class ProfileSettingsComponent implements OnInit {
           showConfirmButton: false
         });
       },
-      error: () => {
-        Swal.fire('Error', 'Failed to update availability', 'error');
+      error: (err) => {
+        console.error('Toggle availability error:', err);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.error?.message || 'Failed to update availability',
+          confirmButtonColor: '#ef4444'
+        });
       }
     });
   }

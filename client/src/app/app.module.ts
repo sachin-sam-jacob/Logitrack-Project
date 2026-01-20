@@ -22,6 +22,9 @@ import { AdminGuard } from './guards/admin.guard';
 import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 
+import { CargoRequestsComponent } from './cargo-request/cargo-requests.component';
+import { CustomerTrackCargoComponent } from './customer-track-cargo/customer-track-cargo.component';
+import { ViewDriversComponent } from './view-drivers/view-drivers.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +42,9 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
     AdminDashboardComponent,
     DeliveryApprovalsComponent,
     ForgotPasswordComponent
+    ViewDriversComponent,
+    CargoRequestsComponent,
+    CustomerTrackCargoComponent
   ],
   imports: [
     BrowserModule,

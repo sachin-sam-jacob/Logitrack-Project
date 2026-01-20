@@ -14,15 +14,19 @@ declare var Swal: any;
 export class AddcargoComponent implements OnInit {
 
   itemForm!: FormGroup;
-  assignForm!: FormGroup;
 
   cargList: any[] = [];
   driverList: any[] = [];
   filteredDriverList: any[] = [];
   
-  selectedCargoId: number | null = null;
-  selectedDriverId: number | null = null;
+  assignModel: any = {
+    cargoId: null,
+    driverId: null
+  };
+
   selectedCargoSourceLocation: string = '';
+  isSubmitting = false;
+  isAssigning = false;
 
   showError = false;
   errorMessage = '';
@@ -37,11 +41,12 @@ export class AddcargoComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.initForms();
+    this.initForm();
     this.getCargo();
+    this.getDrivers();
   }
 
-  initForms() {
+  initForm() {
     this.itemForm = this.fb.group({
       content: ['', Validators.required],
       size: ['', Validators.required],
@@ -49,126 +54,189 @@ export class AddcargoComponent implements OnInit {
       destinationLocation: ['', Validators.required],
       customerName: ['', Validators.required],
       customerContact: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
-      customerAddress: ['', Validators.required],
-      estimatedDeliveryDate: ['']
+      customerEmail: ['', [Validators.required, Validators.email]],
+      customerAddress: ['', Validators.required]
     });
   }
 
-  // Add Cargo
+  onSourceLocationChange() {
+    const sourceLocation = this.itemForm.get('sourceLocation')?.value;
+    console.log('Source location changed to:', sourceLocation);
+  }
+
   onSubmit() {
     if (this.itemForm.invalid) {
       this.itemForm.markAllAsTouched();
-      Swal.fire('Incomplete Form', 'Please fill all required fields', 'warning');
+      Swal.fire({
+        icon: 'warning',
+        title: 'Incomplete Form',
+        text: 'Please fill all required fields correctly',
+        confirmButtonColor: '#3b82f6'
+      });
       return;
     }
 
-    const payload = {
-      ...this.itemForm.value,
-      estimatedDeliveryDate: this.itemForm.value.estimatedDeliveryDate 
-        ? new Date(this.itemForm.value.estimatedDeliveryDate).toISOString()
-        : null
-    };
+    this.isSubmitting = true;
+    this.showError = false;
+    this.showMessage = false;
 
-    this.httpService.addCargo(payload).subscribe({
+    console.log('Submitting cargo with data:', this.itemForm.value);
+
+    this.httpService.addCargo(this.itemForm.value).subscribe({
       next: (res: any) => {
+        this.isSubmitting = false;
+        
         Swal.fire({
           icon: 'success',
-          title: 'Success!',
-          text: 'Cargo created successfully',
-          timer: 2000,
-          showConfirmButton: false
+          title: 'Cargo Created!',
+          html: `
+            <p>Cargo created successfully!</p>
+            <p><strong>Tracking Number:</strong> ${res.trackingNumber || 'Generating...'}</p>
+            <p>Tracking details sent to: <strong>${this.itemForm.value.customerEmail}</strong></p>
+          `,
+          confirmButtonColor: '#10b981'
         });
+
         this.itemForm.reset();
         this.getCargo();
       },
       error: (err) => {
-        Swal.fire('Error', err.error?.message || 'Failed to add cargo', 'error');
+        this.isSubmitting = false;
+        this.showError = true;
+        this.errorMessage = err.error?.message || 'Failed to add cargo';
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: this.errorMessage,
+          confirmButtonColor: '#ef4444'
+        });
       }
     });
   }
 
-  // Fetch Cargos
   getCargo() {
     this.httpService.getCargo().subscribe({
       next: (res: any) => {
         this.cargList = res;
+        console.log('Loaded cargos:', this.cargList);
       },
       error: () => {
-        Swal.fire('Error', 'Unable to fetch cargo', 'error');
+        this.showError = true;
+        this.errorMessage = 'Unable to fetch cargo';
       }
     });
   }
 
-  // Select cargo and load drivers for its source location
+  getDrivers() {
+    this.httpService.getAllDrivers().subscribe({
+      next: (res: any) => {
+        this.driverList = res;
+        console.log('Loaded drivers:', this.driverList);
+      },
+      error: () => {
+        this.showError = true;
+        this.errorMessage = 'Unable to fetch drivers';
+      }
+    });
+  }
+
   selectCargo(event: Event) {
     const target = event.target as HTMLSelectElement;
-    const cargoId = Number(target.value);
+    const cargoId = target.value;
     
-    if (!cargoId) {
-      this.selectedCargoId = null;
+    this.assignModel.cargoId = cargoId;
+    this.assignModel.driverId = null;
+
+    if (cargoId) {
+      const selectedCargo = this.cargList.find(c => c.id == cargoId);
+      if (selectedCargo) {
+        this.selectedCargoSourceLocation = selectedCargo.sourceLocation;
+        console.log('Selected cargo source location:', this.selectedCargoSourceLocation);
+        this.filterDriversByLocation(this.selectedCargoSourceLocation);
+      }
+    } else {
+      this.selectedCargoSourceLocation = '';
+      this.filteredDriverList = [];
+    }
+  }
+
+  filterDriversByLocation(sourceLocation: string) {
+    if (!sourceLocation) {
       this.filteredDriverList = [];
       return;
     }
 
-    this.selectedCargoId = cargoId;
-    const cargo = this.cargList.find(c => c.id === cargoId);
-    
-    if (cargo) {
-      this.selectedCargoSourceLocation = cargo.sourceLocation;
-      this.loadDriversForLocation(cargo.sourceLocation);
+    this.filteredDriverList = this.driverList.filter(driver => {
+      const driverLocation = (driver.currentLocation || driver.baseLocation || '').trim().toLowerCase();
+      const cargoLocation = sourceLocation.trim().toLowerCase();
+      
+      console.log(`Comparing driver location: "${driverLocation}" with cargo location: "${cargoLocation}"`);
+      
+      return driverLocation === cargoLocation;
+    });
+
+    console.log('Filtered drivers:', this.filteredDriverList);
+
+    if (this.filteredDriverList.length === 0) {
+      Swal.fire({
+        icon: 'info',
+        title: 'No Drivers Available',
+        text: `No drivers found at location: ${sourceLocation}`,
+        confirmButtonColor: '#3b82f6'
+      });
     }
   }
 
-  // Load drivers available at source location
-  loadDriversForLocation(sourceLocation: string) {
-    this.httpService.getDriversForLocation(sourceLocation).subscribe({
-      next: (res: any) => {
-        this.filteredDriverList = res;
-        
-        if (this.filteredDriverList.length === 0) {
-          Swal.fire({
-            icon: 'info',
-            title: 'No Drivers Available',
-            text: `No approved drivers available at ${sourceLocation}`,
-            confirmButtonColor: '#3085d6'
-          });
-        }
-      },
-      error: () => {
-        Swal.fire('Error', 'Unable to fetch drivers', 'error');
-      }
-    });
-  }
-
-  // Select driver
   selectDriver(event: Event) {
     const target = event.target as HTMLSelectElement;
-    this.selectedDriverId = Number(target.value);
+    this.assignModel.driverId = target.value;
+    console.log('Selected driver ID:', this.assignModel.driverId);
   }
 
-  // Assign driver to cargo
   assignDriver() {
-    if (!this.selectedCargoId || !this.selectedDriverId) {
-      Swal.fire('Error', 'Please select both cargo and driver', 'warning');
+    if (!this.assignModel.cargoId || !this.assignModel.driverId) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Missing Selection',
+        text: 'Please select both cargo and driver',
+        confirmButtonColor: '#f59e0b'
+      });
       return;
     }
 
-    this.httpService.assignDriver(this.selectedDriverId, this.selectedCargoId).subscribe({
+    this.isAssigning = true;
+    this.showError = false;
+    this.showMessage = false;
+
+    this.httpService.assignDriver(
+      this.assignModel.driverId,
+      this.assignModel.cargoId
+    ).subscribe({
       next: (res: any) => {
+        this.isAssigning = false;
+        
         Swal.fire({
           icon: 'success',
           title: 'Assigned!',
           text: res.message || 'Driver assigned successfully',
-          timer: 2000,
-          showConfirmButton: false
+          confirmButtonColor: '#10b981'
         });
-        this.getCargo();
-        this.selectedCargoId = null;
-        this.selectedDriverId = null;
+
+        this.assignModel = { cargoId: null, driverId: null };
+        this.selectedCargoSourceLocation = '';
         this.filteredDriverList = [];
+        this.getCargo();
       },
       error: (err) => {
-        Swal.fire('Error', err.error?.message || 'Assignment failed', 'error');
+        this.isAssigning = false;
+        
+        Swal.fire({
+          icon: 'error',
+          title: 'Assignment Failed',
+          text: err.error?.message || 'Failed to assign driver',
+          confirmButtonColor: '#ef4444'
+        });
       }
     });
   }

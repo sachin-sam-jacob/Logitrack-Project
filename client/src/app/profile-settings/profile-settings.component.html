@@ -34,13 +34,34 @@
       </p>
     </div>
 
+    <!-- FIXED: Driver Location Display -->
+    <div *ngIf="role === 'DRIVER' && detailsCompleted" class="location-display">
+      <h3>📍 Location Information</h3>
+      <div class="location-grid">
+        <div class="location-item">
+          <span class="location-label">Base Location:</span>
+          <span class="location-value">{{ baseLocation || 'Not set' }}</span>
+        </div>
+        <div class="location-item">
+          <span class="location-label">Current Location:</span>
+          <span class="location-value">{{ currentLocation || baseLocation || 'Not set' }}</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Driver Availability Toggle -->
     <div *ngIf="role === 'DRIVER' && verificationStatus === 'APPROVED'" class="availability-toggle">
       <label class="toggle-switch">
-        <input type="checkbox" [checked]="isAvailable" (change)="toggleAvailability()" />
+        <input 
+          type="checkbox" 
+          [checked]="isAvailable" 
+          (change)="toggleAvailability()" 
+        />
         <span class="slider"></span>
       </label>
-      <span>{{ isAvailable ? 'Available for assignments' : 'Unavailable' }}</span>
+      <span class="toggle-label">
+        {{ isAvailable ? '✅ Available for assignments' : '❌ Unavailable' }}
+      </span>
     </div>
 
     <!-- BUSINESS FORM -->
@@ -137,10 +158,13 @@
       </div>
 
       <div class="input-group">
-        <label>Location <span class="required">*</span></label>
+        <label>Base Location <span class="required">*</span></label>
         <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
         <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
           Location is required
+        </small>
+        <small class="info-text">
+          ℹ️ This is your primary operating location. Your current location will update after deliveries.
         </small>
       </div>
 
@@ -198,6 +222,14 @@
         <textarea formControlName="address" rows="3" placeholder="Enter your full address"></textarea>
         <small class="error" *ngIf="detailsForm.get('address')?.invalid && detailsForm.get('address')?.touched">
           Address is required
+        </small>
+      </div>
+
+      <div class="input-group">
+        <label>Location <span class="required">*</span></label>
+        <input type="text" formControlName="location" placeholder="City/Area" />
+        <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
+          Location is required
         </small>
       </div>
 

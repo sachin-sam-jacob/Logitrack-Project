@@ -1,0 +1,75 @@
+<div class="drivers-container">
+
+  <div class="page-header">
+    <h2>🚚 Available Drivers</h2>
+    <p>View all verified drivers and their details</p>
+  </div>
+
+  <div class="search-filter">
+    <input 
+      type="text" 
+      placeholder="Search by name, vehicle type, or location..."
+      [(ngModel)]="searchKeyword"
+      (keyup)="filterDrivers()"
+    />
+    <select [(ngModel)]="filterLocation" (change)="filterDrivers()">
+      <option value="">All Locations</option>
+      <option *ngFor="let loc of uniqueLocations" [value]="loc">{{ loc }}</option>
+    </select>
+  </div>
+
+  <div class="alert error" *ngIf="showError">
+    {{ errorMessage }}
+  </div>
+
+  <div class="drivers-grid" *ngIf="!isLoading && filteredDrivers.length > 0">
+    <div class="driver-card" *ngFor="let driver of filteredDrivers">
+      <div class="driver-header">
+        <div class="driver-avatar">
+          {{ driver.name?.charAt(0) | uppercase }}
+        </div>
+        <div class="driver-info">
+          <h3>{{ driver.name }}</h3>
+          <p class="email">{{ driver.email }}</p>
+        </div>
+        <span 
+          class="status-badge" 
+          [ngClass]="driver.available ? 'available' : 'unavailable'">
+          {{ driver.available ? '✅ Available' : '❌ Busy' }}
+        </span>
+      </div>
+
+      <div class="driver-details">
+        <div class="detail-row">
+          <span class="label">📞 Contact:</span>
+          <span class="value">{{ driver.contactNumber }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">🚗 Vehicle Type:</span>
+          <span class="value">{{ driver.vehicleType }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">🔢 Vehicle Number:</span>
+          <span class="value">{{ driver.vehicleNumber }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">📍 Base Location:</span>
+          <span class="value">{{ driver.baseLocation }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">🗺️ Current Location:</span>
+          <span class="value">{{ driver.currentLocation || 'Not updated' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && filteredDrivers.length === 0">
+    <p>🚫 No drivers found matching your criteria</p>
+  </div>
+
+  <div class="loading" *ngIf="isLoading">
+    <p>Loading drivers...</p>
+  </div>
+
+</div>
