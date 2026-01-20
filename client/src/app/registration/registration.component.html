@@ -1,16 +1,19 @@
 <div class="auth-container">
+    <button class="back-home-btn" routerLink="/">
+    <span>←</span> Back to Home
+  </button>
   <div class="auth-card">
     <!-- Left Image / Illustration -->
     <div class="auth-left">
       <img
-        src="https://cdn-icons-png.flaticon.com/512/4333/4333609.png"
-        alt="Register Illustration"
+        src="https://cdn-icons-png.flaticon.com/512/2769/2769339.png"
+        alt="Logistics Illustration"
       />
     </div>
 
     <!-- Right Form -->
     <div class="auth-right">
-      <h2>Create Your Account </h2>
+      <h2>Create Your Account 🚚</h2>
       <p>Join our Logistic Management System</p>
 
       <div class="form-scroll">
@@ -42,85 +45,82 @@
             </small>
           </div>
 
+          <!-- Password -->
+          <div class="input-group password-group">
+            <label>Password</label>
+            <div class="password-wrapper">
+              <input
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Create a strong password"
+                (focus)="showChecklist = true"
+                (blur)="hideChecklist()"
+              />
+              <span class="toggle-eye" (click)="togglePasswordVisibility()">
+                <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </span>
+            </div>
+            
+            <!-- Password Strength Meter -->
+            <div class="strength-wrapper" *ngIf="passwordValue">
+              <div class="strength-header">
+                <span>Password strength</span>
+                <span class="strength-label" [ngClass]="strengthClass">
+                  {{ strengthLabel }}
+                </span>
+              </div>
 
+              <div class="strength-bar">
+                <div
+                  class="strength-fill"
+                  [ngClass]="strengthClass"
+                  [style.width.%]="strengthPercent">
+                </div>
+              </div>
+            </div>
 
-<div class="input-group password-group">
-  <label>Password</label>
-  <div class="password-wrapper">
-    <input
-      [type]="showPassword ? 'text' : 'password'"
-      formControlName="password"
-      placeholder="Create a strong password"
-      (focus)="showChecklist = true"
-      (blur)="hideChecklist()"
-    />
-    <!-- Eye Icon -->
-    <span class="toggle-eye" (click)="togglePasswordVisibility()">
-      <i class="fa" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-    </span>
-  </div>
-  <!-- Password Strength Meter -->
-<div class="strength-wrapper" *ngIf="passwordValue">
-  <div class="strength-header">
-    <span>Password strength</span>
-    <span class="strength-label" [ngClass]="strengthClass">
-      {{ strengthLabel }}
-    </span>
-  </div>
+            <!-- Live validation checklist -->
+            <div class="password-checklist" *ngIf="showChecklist && !allValid">
+              <p [class.valid]="hasMinLength">
+                <span>{{ hasMinLength ? '✅' : '❌' }}</span> Minimum 8 characters
+              </p>
+              <p [class.valid]="hasLowerCase">
+                <span>{{ hasLowerCase ? '✅' : '❌' }}</span> At least one lowercase letter
+              </p>
+              <p [class.valid]="hasUpperCase">
+                <span>{{ hasUpperCase ? '✅' : '❌' }}</span> At least one uppercase letter
+              </p>
+              <p [class.valid]="hasDigit">
+                <span>{{ hasDigit ? '✅' : '❌' }}</span> At least one digit
+              </p>
+              <p [class.valid]="hasSpecialChar">
+                <span>{{ hasSpecialChar ? '✅' : '❌' }}</span> At least one special character
+              </p>
+            </div>
+          </div>
 
-  <div class="strength-bar">
-    <div
-      class="strength-fill"
-      [ngClass]="strengthClass"
-      [style.width.%]="strengthPercent">
-    </div>
-  </div>
-</div>
+          <!-- CONFIRM PASSWORD -->
+          <div class="input-group password-group">
+            <label>Confirm Password</label>
 
+            <div class="password-wrapper">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                formControlName="confirmPassword"
+                placeholder="Re-enter your password"
+              />
+              <span class="toggle-eye" (click)="toggleConfirmPasswordVisibility()">
+                <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+              </span>
+            </div>
 
-  <!-- Live validation checklist -->
-  <div class="password-checklist" *ngIf="showChecklist && !allValid">
-    <p [class.valid]="hasMinLength">
-      <span>{{ hasMinLength ? '✅' : '❌' }}</span> Minimum 8 characters
-    </p>
-    <p [class.valid]="hasLowerCase">
-      <span>{{ hasLowerCase ? '✅' : '❌' }}</span> At least one lowercase letter
-    </p>
-    <p [class.valid]="hasUpperCase">
-      <span>{{ hasUpperCase ? '✅' : '❌' }}</span> At least one uppercase letter
-    </p>
-    <p [class.valid]="hasDigit">
-      <span>{{ hasDigit ? '✅' : '❌' }}</span> At least one digit
-    </p>
-    <p [class.valid]="hasSpecialChar">
-      <span>{{ hasSpecialChar ? '✅' : '❌' }}</span> At least one special character
-    </p>
-  </div>
-</div>
-
-
-<!-- CONFIRM PASSWORD -->
-<div class="input-group password-group">
-  <label>Confirm Password</label>
-
-  <div class="password-wrapper">
-    <input
-      [type]="showConfirmPassword ? 'text' : 'password'"
-      formControlName="confirmPassword"
-      placeholder="Re-enter your password"
-    />
-    <span class="toggle-eye" (click)="toggleConfirmPasswordVisibility()">
-      <i class="fa" [ngClass]="showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
-    </span>
-  </div>
-
-  <small class="error" *ngIf="
-    itemForm.hasError('passwordMismatch') &&
-    itemForm.get('confirmPassword')?.touched
-  ">
-    Passwords do not match
-  </small>
-</div>
+            <small class="error" *ngIf="
+              itemForm.hasError('passwordMismatch') &&
+              itemForm.get('confirmPassword')?.touched
+            ">
+              Passwords do not match
+            </small>
+          </div>
 
           <!-- Role -->
           <div class="input-group">
@@ -138,41 +138,37 @@
           </div>
 
           <!-- Submit Button -->
-      <div class="input-group">  
-        <button 
-          type="submit" 
-          [disabled]="itemForm.invalid || isSubmitting || otpSent" 
-          class="btn primary-btn">
-          {{ isSubmitting ? 'Registering...' : 'Register' }}
-        </button>  
-      </div>
+          <div class="input-group">  
+            <button 
+              type="submit" 
+              [disabled]="itemForm.invalid || isSubmitting || otpSent" 
+              class="btn primary-btn">
+              {{ isSubmitting ? 'Registering...' : 'Register' }}
+            </button>  
+          </div>
 
+          <div *ngIf="otpSent" class="input-group">
+            <label>Enter OTP</label>
+            <input type="text" formControlName="otp" placeholder="6-digit OTP" />
+          </div>
 
-        <div *ngIf="otpSent" class="input-group">
-          <label>Enter OTP</label>
-          <input type="text" formControlName="otp" placeholder="6-digit OTP" />
-        </div>
-
-        <div *ngIf="otpSent" class="input-group">
-          <button type="button"  [disabled]="!itemForm.value.otp"  class="btn primary-btn" (click)="verifyOtp()">
+          <div *ngIf="otpSent" class="input-group">
+            <button type="button" [disabled]="!itemForm.value.otp" class="btn primary-btn" (click)="verifyOtp()">
               Verify OTP
-          </button>
-        </div>
-        <div *ngIf="otpSent" class="resend-container">
-        <button
-          class="btn link-btn"
-          [disabled]="resendDisabled"
-          (click)="resendOtp()">
-          {{ resendDisabled ? 'Resend OTP in ' + countdown + 's' : 'Resend OTP' }}
-        </button>
-      </div>
+            </button>
+          </div>
+          
+          <div *ngIf="otpSent" class="resend-container">
+            <button
+              class="btn link-btn"
+              [disabled]="resendDisabled"
+              (click)="resendOtp()">
+              {{ resendDisabled ? 'Resend OTP in ' + countdown + 's' : 'Resend OTP' }}
+            </button>
+          </div>
 
         </form>
       </div>
-
-      <!-- <div class="response-message" *ngIf="responseMessage">
-        {{responseMessage}}
-      </div> -->
 
       <p class="switch-link">
         Already have an account?

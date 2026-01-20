@@ -28,7 +28,7 @@ public class BusinessController {
     private DriverService driverService;
 
     /**
-     * Create cargo with customer details and locations
+     * Create cargo with customer email for tracking
      */
     @PostMapping("/cargo")
     public ResponseEntity<?> addCargo(
@@ -55,9 +55,37 @@ public class BusinessController {
     }
 
     /**
-     * Get available drivers for specific source location
+     * Get all drivers (excluding sensitive info)
      */
     @GetMapping("/drivers")
+    public ResponseEntity<List<Map<String, Object>>> getAllDrivers() {
+        List<Driver> drivers = driverService.getAllDriversForBusiness();
+        
+        // Filter out sensitive information
+        List<Map<String, Object>> driverList = drivers.stream()
+            .map(d -> {
+                Map<String, Object> driverInfo = new HashMap<>();
+                driverInfo.put("id", d.getId());
+                driverInfo.put("name", d.getName());
+                driverInfo.put("email", d.getEmail());
+                driverInfo.put("vehicleType", d.getVehicleType());
+                driverInfo.put("vehicleNumber", d.getVehicleNumber());
+                driverInfo.put("contactNumber", d.getContactNumber());
+                driverInfo.put("currentLocation", d.getCurrentLocation());
+                driverInfo.put("baseLocation", d.getBaseLocation());
+                driverInfo.put("available", d.isAvailable());
+                driverInfo.put("verificationStatus", d.getVerificationStatus());
+                return driverInfo;
+            })
+            .collect(Collectors.toList());
+        
+        return ResponseEntity.ok(driverList);
+    }
+
+    /**
+     * Get available drivers for specific source location
+     */
+    @GetMapping("/available-drivers")
     public ResponseEntity<List<Driver>> getAvailableDrivers(
             @RequestParam(required = false) String sourceLocation) {
         
@@ -135,7 +163,7 @@ public class BusinessController {
         List<Cargo> allCargos = cargoService.getBusinessCargos(auth.getName());
         List<Cargo> pendingApprovals = allCargos.stream()
             .filter(c -> "AWAITING_APPROVAL".equals(c.getStatus()))
-            .collect(Collectors.toList());   // ✅ Java 8+
+            .collect(Collectors.toList());
 
         return ResponseEntity.ok(pendingApprovals);
     }

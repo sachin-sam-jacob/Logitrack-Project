@@ -20,6 +20,9 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
 import { HttpService } from '../services/http.service';
 import { AdminGuard } from './guards/admin.guard';
 import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approvals.component';
+import { ViewDriversComponent } from './view-drivers/view-drivers.component';
+import { CargoRequestsComponent } from './cargo-request/cargo-requests.component';
+import { CustomerTrackCargoComponent } from './customer-track-cargo/customer-track-cargo.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,10 @@ import { DeliveryApprovalsComponent } from './delivery-approvals/delivery-approv
     UserDetailsComponent,
     ProfileSettingsComponent,
     AdminDashboardComponent,
-    DeliveryApprovalsComponent
+    DeliveryApprovalsComponent,
+    ViewDriversComponent,
+    CargoRequestsComponent,
+    CustomerTrackCargoComponent
   ],
   imports: [
     BrowserModule,

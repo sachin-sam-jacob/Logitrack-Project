@@ -1,0 +1,249 @@
+<div class="track-container">
+
+  <div class="page-header">
+    <h2>📦 Track Your Cargo</h2>
+    <p>Enter your email or tracking number to view your shipments</p>
+  </div>
+
+  <!-- Search Options -->
+  <div class="search-card">
+    <div class="search-tabs">
+      <button 
+        class="tab-btn" 
+        [class.active]="searchMode === 'email'"
+        (click)="switchSearchMode('email')">
+        By Email
+      </button>
+      <button 
+        class="tab-btn" 
+        [class.active]="searchMode === 'tracking'"
+        (click)="switchSearchMode('tracking')">
+        By Tracking Number
+      </button>
+    </div>
+
+    <div class="search-input-group" *ngIf="searchMode === 'email'">
+      <input
+        type="email"
+        placeholder="Enter your email address"
+        [(ngModel)]="customerEmail"
+      />
+      <button (click)="searchByEmail()">🔍 Search</button>
+    </div>
+
+    <div class="search-input-group" *ngIf="searchMode === 'tracking'">
+      <input
+        type="text"
+        placeholder="Enter tracking number"
+        [(ngModel)]="trackingNumber"
+      />
+      <button (click)="searchByTracking()">🔍 Track</button>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div class="alert error" *ngIf="showError">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Cargo List (Email Search) -->
+  <div class="cargos-list" *ngIf="searchMode === 'email' && cargos.length > 0">
+    <div class="cargo-card" *ngFor="let cargo of cargos">
+      <div class="cargo-header">
+        <div class="tracking-badge">
+          <span class="label">Tracking #</span>
+          <span class="number">{{ cargo.trackingNumber }}</span>
+        </div>
+        <span class="status-badge" [ngClass]="getStatusClass(cargo.status)">
+          {{ getCustomerVisibleStatus(cargo.status) }}
+        </span>
+      </div>
+
+      <div class="cargo-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Content</span>
+            <span class="value">{{ cargo.content }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Size</span>
+            <span class="value">{{ cargo.size }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">From</span>
+            <span class="value">{{ cargo.sourceLocation }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">To</span>
+            <span class="value">{{ cargo.destinationLocation }}</span>
+          </div>
+          <div class="info-item" *ngIf="cargo.driver && cargo.status !== 'CREATED'">
+            <span class="label">Driver</span>
+            <span class="value">{{ cargo.driver.name }}</span>
+          </div>
+          <div class="info-item" *ngIf="cargo.driver && cargo.status !== 'CREATED'">
+            <span class="label">Driver Contact</span>
+            <span class="value">{{ cargo.driver.contactNumber }}</span>
+          </div>
+        </div>
+
+        <!-- OTP Verification Button -->
+        <div class="otp-section" *ngIf="needsOtpVerification(cargo)">
+          <button class="btn-verify-otp" (click)="openOtpModal(cargo)">
+            🔒 Verify Delivery OTP
+          </button>
+          <p class="otp-hint">Check your email for the delivery OTP</p>
+        </div>
+
+        <!-- Progress Timeline -->
+        <div class="timeline">
+          <div class="step" [class.completed]="isStepCompleted(cargo.status, 'CREATED')">
+            <div class="step-icon">✓</div>
+            <div class="step-label">Created</div>
+          </div>
+          <div class="step" [class.completed]="isStepCompleted(cargo.status, 'PICKED_UP')">
+            <div class="step-icon">✓</div>
+            <div class="step-label">Picked Up</div>
+          </div>
+          <div class="step" [class.completed]="isStepCompleted(cargo.status, 'IN_TRANSIT')">
+            <div class="step-icon">✓</div>
+            <div class="step-label">In Transit</div>
+          </div>
+          <div class="step" [class.completed]="isStepCompleted(cargo.status, 'DELIVERED')">
+            <div class="step-icon">✓</div>
+            <div class="step-label">Delivered</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Single Cargo Details (Tracking Number Search) -->
+  <div class="cargo-details" *ngIf="searchMode === 'tracking' && singleCargo">
+    <div class="details-card">
+      <div class="details-header">
+        <h3>Cargo Details</h3>
+        <span class="status-badge" [ngClass]="getStatusClass(singleCargo.status)">
+          {{ getCustomerVisibleStatus(singleCargo.status) }}
+        </span>
+      </div>
+
+      <div class="details-body">
+        <div class="detail-row">
+          <span class="label">Tracking Number</span>
+          <span class="value">{{ singleCargo.trackingNumber }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Content</span>
+          <span class="value">{{ singleCargo.content }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Size</span>
+          <span class="value">{{ singleCargo.size }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">From</span>
+          <span class="value">{{ singleCargo.sourceLocation }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">To</span>
+          <span class="value">{{ singleCargo.destinationLocation }}</span>
+        </div>
+        <div class="detail-row" *ngIf="singleCargo.driver && singleCargo.status !== 'CREATED'">
+          <span class="label">Driver</span>
+          <span class="value">{{ singleCargo.driver.name }}</span>
+        </div>
+        <div class="detail-row" *ngIf="singleCargo.driver && singleCargo.status !== 'CREATED'">
+          <span class="label">Driver Contact</span>
+          <span class="value">{{ singleCargo.driver.contactNumber }}</span>
+        </div>
+      </div>
+
+      <!-- OTP Verification Button -->
+      <div class="otp-section" *ngIf="needsOtpVerification(singleCargo)">
+        <button class="btn-verify-otp" (click)="openOtpModal(singleCargo)">
+          🔒 Verify Delivery OTP
+        </button>
+        <p class="otp-hint">Check your email for the delivery OTP</p>
+      </div>
+
+      <!-- Progress Timeline -->
+      <div class="timeline-vertical">
+        <div class="timeline-step" [class.completed]="isStepCompleted(singleCargo.status, 'CREATED')">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">Created</div>
+            <div class="step-time">{{ singleCargo.createdAt | date: 'short' }}</div>
+          </div>
+        </div>
+        <div class="timeline-step" [class.completed]="isStepCompleted(singleCargo.status, 'PICKED_UP')">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">Picked Up</div>
+          </div>
+        </div>
+        <div class="timeline-step" [class.completed]="isStepCompleted(singleCargo.status, 'IN_TRANSIT')">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">In Transit</div>
+          </div>
+        </div>
+        <div class="timeline-step" [class.completed]="isStepCompleted(singleCargo.status, 'DELIVERED')">
+          <div class="step-marker"></div>
+          <div class="step-content">
+            <div class="step-title">Delivered</div>
+            <div class="step-time" *ngIf="singleCargo.actualDeliveryDate">
+              {{ singleCargo.actualDeliveryDate | date: 'short' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!showError && !singleCargo && cargos.length === 0 && hasSearched">
+    <p>🔭 No cargo found</p>
+  </div>
+
+</div>
+
+<!-- OTP Verification Modal -->
+<div class="modal-overlay" *ngIf="showOtpModal" (click)="closeOtpModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <div class="modal-header">
+      <h2>🔒 Verify Delivery</h2>
+      <button class="close-btn" (click)="closeOtpModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <p>Please enter the 6-digit OTP sent to your email to confirm delivery:</p>
+      
+      <div class="otp-input-group">
+        <input 
+          type="text" 
+          [(ngModel)]="otpInput" 
+          placeholder="Enter 6-digit OTP"
+          maxlength="6"
+          class="otp-input"
+        />
+      </div>
+
+      <div class="cargo-info">
+        <p><strong>Cargo:</strong> {{ selectedCargoForOtp?.content }}</p>
+        <p><strong>Tracking #:</strong> {{ selectedCargoForOtp?.trackingNumber }}</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-primary" (click)="verifyOtp()" [disabled]="!otpInput || otpInput.length !== 6">
+        Verify & Confirm Delivery
+      </button>
+      <button class="btn btn-secondary" (click)="closeOtpModal()">
+        Cancel
+      </button>
+    </div>
+
+  </div>
+</div>

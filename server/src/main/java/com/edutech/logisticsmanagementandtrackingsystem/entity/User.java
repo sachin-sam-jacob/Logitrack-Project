@@ -13,7 +13,7 @@ public class User {
     private String password;
     @Column(name="role")
     private String role;
-    @Column(name="email") // Role can be 'BUSINESS', 'DRIVER', 'CUSTOMER'
+    @Column(name="email",unique = true) // Role can be 'BUSINESS', 'DRIVER', 'CUSTOMER'
     private String email;
 
     @Column(nullable = false)

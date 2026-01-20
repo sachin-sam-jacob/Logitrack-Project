@@ -67,25 +67,39 @@ public class RegisterAndLoginController {
 
     // REGISTER - FIXED
     @PostMapping("/register")  
-    public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {  
-        try {
-            User registeredUser = userService.registerUser(user);  
-            if (registeredUser == null) {  
-                Map<String, String> error = new HashMap<>();  
-                error.put("message", "User already exists");  
-                return ResponseEntity.badRequest().body(error);  
-            }  
-
-            otpService.generateAndSendOtp(registeredUser);  
-            Map<String, String> success = new HashMap<>();  
-            success.put("message", "OTP sent to email");  
-            return ResponseEntity.ok(success);  
-        } catch (Exception e) {
+public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {  
+    try {
+        // Check if username already exists
+        if (userRepository.findByUsername(user.getUsername()) != null) {
             Map<String, String> error = new HashMap<>();  
-            error.put("message", "Registration failed: " + e.getMessage());  
-            return ResponseEntity.internalServerError().body(error);
+            error.put("message", "Username already exists");  
+            return ResponseEntity.badRequest().body(error);
         }
-    }  
+        
+        // FIXED: Check if email already exists
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            Map<String, String> error = new HashMap<>();  
+            error.put("message", "Email already registered. Please use a different email.");  
+            return ResponseEntity.badRequest().body(error);
+        }
+        
+        User registeredUser = userService.registerUser(user);  
+        if (registeredUser == null) {  
+            Map<String, String> error = new HashMap<>();  
+            error.put("message", "Registration failed");  
+            return ResponseEntity.badRequest().body(error);  
+        }  
+
+        otpService.generateAndSendOtp(registeredUser);  
+        Map<String, String> success = new HashMap<>();  
+        success.put("message", "OTP sent to email");  
+        return ResponseEntity.ok(success);  
+    } catch (Exception e) {
+        Map<String, String> error = new HashMap<>();  
+        error.put("message", "Registration failed: " + e.getMessage());  
+        return ResponseEntity.internalServerError().body(error);
+    }
+}
 
     // VERIFY OTP  
     @PostMapping("/verify-otp")

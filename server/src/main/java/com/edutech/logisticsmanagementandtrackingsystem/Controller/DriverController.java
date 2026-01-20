@@ -6,9 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Cargo;
+import com.edutech.logisticsmanagementandtrackingsystem.entity.Driver;
+import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoRepository;
+import com.edutech.logisticsmanagementandtrackingsystem.repository.DriverRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.service.CargoService;
+import com.edutech.logisticsmanagementandtrackingsystem.service.CustomerService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.DriverService;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,15 @@ public class DriverController {
 
     @Autowired
     private CargoService cargoService;
+
+    @Autowired
+    private CustomerService customerService;
+
+    @Autowired
+    private CargoRepository cargoRepository;
+
+    @Autowired
+    private DriverRepository driverRepository;
 
     /**
      * Get assigned cargos for driver
@@ -38,6 +52,58 @@ public class DriverController {
         } catch (Exception e) {
             Map<String, String> error = new HashMap<>();
             error.put("message", "Failed to fetch cargos: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Get pending cargo requests (assigned but not accepted)
+     */
+    @GetMapping("/pending-requests")
+    public ResponseEntity<?> getPendingRequests(@RequestParam Long driverId) {
+        try {
+            List<Cargo> cargos = driverService.getPendingCargoRequests(driverId);
+            return ResponseEntity.ok(cargos);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Accept cargo assignment
+     */
+    @PostMapping("/accept-cargo")
+    public ResponseEntity<?> acceptCargo(@RequestParam Long cargoId) {
+        try {
+            Cargo cargo = cargoService.acceptCargoByDriver(cargoId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Cargo accepted successfully");
+            response.put("cargo", cargo);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * Reject cargo assignment
+     */
+    @PostMapping("/reject-cargo")
+    public ResponseEntity<?> rejectCargo(
+            @RequestParam Long cargoId,
+            @RequestParam(required = false) String reason) {
+        try {
+            cargoService.rejectCargoByDriver(cargoId, reason);
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Cargo rejected successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(error);
         }
     }
@@ -116,4 +182,45 @@ public class DriverController {
             return ResponseEntity.badRequest().body(error);
         }
     }
+
+
+    @PostMapping("/verify-delivery-otp")
+public ResponseEntity<?> verifyDeliveryOtp(
+        @RequestParam Long cargoId,
+        @RequestParam String otp) {
+    try {
+        boolean verified = customerService.verifyDeliveryOtp(cargoId, otp);
+        
+        if (verified) {
+            // Update cargo status to DELIVERED after OTP verification
+            Cargo cargo = cargoRepository.findById(cargoId)
+                .orElseThrow(() -> new RuntimeException("Cargo not found"));
+            
+            cargo.setStatus("DELIVERED");
+            cargo.setActualDeliveryDate(LocalDateTime.now());
+            
+            // Make driver available again
+            Driver driver = cargo.getDriver();
+            if (driver != null) {
+                driver.setCurrentLocation(cargo.getDestinationLocation());
+                driver.setAvailable(true);
+                driverRepository.save(driver);
+            }
+            
+            cargoRepository.save(cargo);
+            
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Delivery verified successfully");
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Invalid OTP");
+            return ResponseEntity.badRequest().body(error);
+        }
+    } catch (Exception e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", e.getMessage());
+        return ResponseEntity.badRequest().body(error);
+    }
+}
 }
