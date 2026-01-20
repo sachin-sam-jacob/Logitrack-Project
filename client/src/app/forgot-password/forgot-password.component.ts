@@ -127,7 +127,7 @@ export class ForgotPasswordComponent {
 
     this.loading = true;
     this.http.requestPasswordReset(this.form.value.email).subscribe({
-      next: (res) => {
+      next: (res:any) => {
         this.loading = false;
         if (res?.username) {
           this.otpSent = true;
@@ -138,7 +138,7 @@ export class ForgotPasswordComponent {
           this.successMessage = res?.message || 'If this email is registered, OTP has been sent.';
         }
       },
-      error: (err) => {
+      error: (err:any) => {
         this.loading = false;
         if (err?.status === 0)       this.errorMessage = 'Cannot reach server. Check API URL/CORS.';
         else if (err?.status === 404) this.errorMessage = 'This email is not registered.';
@@ -220,7 +220,7 @@ export class ForgotPasswordComponent {
             this.router.navigate(['/login'])
           });
       },
-      error: (err) => {
+      error: (err:any) => {
         this.loading = false;
         this.errorMessage = err?.error?.message || 'Unable to update password. Please try again.';
       }

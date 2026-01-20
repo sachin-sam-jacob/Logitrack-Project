@@ -41,7 +41,7 @@ import { ViewDriversComponent } from './view-drivers/view-drivers.component';
     ProfileSettingsComponent,
     AdminDashboardComponent,
     DeliveryApprovalsComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
     ViewDriversComponent,
     CargoRequestsComponent,
     CustomerTrackCargoComponent

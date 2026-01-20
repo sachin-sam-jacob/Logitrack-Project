@@ -306,5 +306,23 @@ export class HttpService {
   );
 }
 
+requestPasswordReset(email: string) {
+  const headers = new HttpHeaders().set('Content-Type', 'application/json');
+  // Expecting response: { message: string, username?: string }
+  return this.http.post<{ message: string; username?: string }>(
+    `${this.serverName}/api/forgot-password/request`,
+    { email },
+    { headers }
+  );
+}
+ 
+resetPassword(payload: { username: string; newPassword: string }) {
+  const headers = new HttpHeaders().set('Content-Type', 'application/json');
+  return this.http.post(
+    `${this.serverName}/api/forgot-password/reset`,
+    payload,
+    { headers }
+  );
+}
 
 }
