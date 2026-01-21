@@ -12,8 +12,7 @@ import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User,Long> {
-    @Query("SELECT u FROM User u WHERE u.username = :username")
-    User findByUsername(@Param("username") String username);
+    User findByUsername(String username);
 
 
     boolean existsByEmailIgnoreCase(String email);

@@ -58,6 +58,11 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
+        // FIXED: Case-sensitive username check
+        if (!user.getUsername().equals(username)) {
+            throw new UsernameNotFoundException("Invalid username or password");
+        }
+
         // FIXED: Allow ADMIN to login even without email verification
         if (!"ADMIN".equals(user.getRole()) && !user.isEnabled()) {
             throw new UsernameNotFoundException(
