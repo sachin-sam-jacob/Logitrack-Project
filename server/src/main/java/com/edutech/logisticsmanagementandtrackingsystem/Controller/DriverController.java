@@ -192,25 +192,19 @@ public ResponseEntity<?> verifyDeliveryOtp(
         boolean verified = customerService.verifyDeliveryOtp(cargoId, otp);
         
         if (verified) {
-            // Update cargo status to DELIVERED after OTP verification
             Cargo cargo = cargoRepository.findById(cargoId)
                 .orElseThrow(() -> new RuntimeException("Cargo not found"));
-            
-            cargo.setStatus("DELIVERED");
-            cargo.setActualDeliveryDate(LocalDateTime.now());
             
             // Make driver available again
             Driver driver = cargo.getDriver();
             if (driver != null) {
                 driver.setCurrentLocation(cargo.getDestinationLocation());
-                driver.setAvailable(true);
+                driver.setAvailable(true); // Driver becomes available
                 driverRepository.save(driver);
             }
             
-            cargoRepository.save(cargo);
-            
             Map<String, String> response = new HashMap<>();
-            response.put("message", "Delivery verified successfully");
+            response.put("message", "Delivery verified successfully. You are now available for new assignments.");
             return ResponseEntity.ok(response);
         } else {
             Map<String, String> error = new HashMap<>();

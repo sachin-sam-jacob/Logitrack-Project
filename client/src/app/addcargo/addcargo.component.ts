@@ -118,8 +118,17 @@ export class AddcargoComponent implements OnInit {
   getCargo() {
     this.httpService.getCargo().subscribe({
       next: (res: any) => {
-        this.cargList = res;
-        console.log('Loaded cargos:', this.cargList);
+        // ✅ FIX: Filter out DELIVERED and ASSIGNED cargos from dropdown
+        this.cargList = res.filter((cargo: any) => {
+          return cargo.status !== 'DELIVERED' && 
+                 cargo.status !== 'ASSIGNED' &&
+                 cargo.status !== 'ACCEPTED' &&
+                 cargo.status !== 'PICKED_UP' &&
+                 cargo.status !== 'IN_TRANSIT' &&
+                 cargo.status !== 'AWAITING_OTP' &&
+                 cargo.status !== 'AWAITING_APPROVAL';
+        });
+        console.log('Loaded assignable cargos:', this.cargList);
       },
       error: () => {
         this.showError = true;
@@ -151,6 +160,19 @@ export class AddcargoComponent implements OnInit {
     if (cargoId) {
       const selectedCargo = this.cargList.find(c => c.id == cargoId);
       if (selectedCargo) {
+        // ✅ ADDITIONAL CHECK: Prevent assignment if cargo is already assigned
+        if (selectedCargo.status === 'ASSIGNED' || selectedCargo.status === 'ACCEPTED') {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Cargo Already Assigned',
+            text: 'This cargo is already assigned to a driver. Please wait for driver response.',
+            confirmButtonColor: '#f59e0b'
+          });
+          this.assignModel.cargoId = null;
+          target.value = '';
+          return;
+        }
+
         this.selectedCargoSourceLocation = selectedCargo.sourceLocation;
         console.log('Selected cargo source location:', this.selectedCargoSourceLocation);
         this.filterDriversByLocation(this.selectedCargoSourceLocation);
@@ -226,7 +248,7 @@ export class AddcargoComponent implements OnInit {
         this.assignModel = { cargoId: null, driverId: null };
         this.selectedCargoSourceLocation = '';
         this.filteredDriverList = [];
-        this.getCargo();
+        this.getCargo(); // Refresh list
       },
       error: (err) => {
         this.isAssigning = false;

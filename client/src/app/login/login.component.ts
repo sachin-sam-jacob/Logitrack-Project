@@ -1,25 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpService } from '../../services/http.service';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../environments/environment';
 
 declare const Swal: any;
+declare global {
+  interface Window {
+    handleGoogleSignIn: any;
+    google: any;
+  }
+}
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
 
   itemForm!: FormGroup;
+  googleClientId = environment.googleClientId;
+  private googleLibraryLoaded = false;
 
   constructor(
     public router: Router,
     public httpService: HttpService,
     private formBuilder: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private ngZone: NgZone // Add NgZone
   ) {}
 
   ngOnInit(): void {
@@ -27,6 +37,112 @@ export class LoginComponent implements OnInit {
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
+
+    // Load Google Sign-In library
+    this.loadGoogleSignInScript();
+  }
+
+  ngAfterViewInit(): void {
+    // Set up global callback for Google Sign-In
+    window.handleGoogleSignIn = this.handleGoogleSignIn.bind(this);
+  }
+
+  // NEW: Load Google Sign-In script dynamically
+  loadGoogleSignInScript(): void {
+    if (this.googleLibraryLoaded) {
+      this.initializeGoogleSignIn();
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      this.googleLibraryLoaded = true;
+      this.initializeGoogleSignIn();
+    };
+    document.head.appendChild(script);
+  }
+
+  // NEW: Initialize Google Sign-In after library loads
+  initializeGoogleSignIn(): void {
+    setTimeout(() => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: this.googleClientId,
+          callback: (response: any) => {
+            this.ngZone.run(() => {
+              this.handleGoogleSignIn(response);
+            });
+          }
+        });
+
+        window.google.accounts.id.renderButton(
+          document.getElementById('googleSignInButton'),
+          {
+            theme: 'outline',
+            size: 'large',
+            width: '100%',
+            text: 'signin_with'
+          }
+        );
+      }
+    }, 100);
+  }
+
+  // Google Sign-In callback
+  handleGoogleSignIn(response: any): void {
+    if (response.credential) {
+      this.httpService.googleSignIn(response.credential).subscribe({
+        next: (data: any) => {
+          if (data && data.token) {
+            localStorage.setItem('role', data.role);
+            this.authService.SetId(data.id);
+            this.authService.SetRole(data.role);
+            this.authService.saveToken(data.token);
+            this.authService.setUsername(data.username);
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Google Sign-In Successful',
+              text: `Welcome back, ${data.username}!`,
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              // Use NgZone to ensure Angular detects the navigation
+              this.ngZone.run(() => {
+                if (data.role === 'ADMIN') {
+                  this.router.navigateByUrl('/admin-dashboard').then(() => {
+                    window.location.reload(); // Force reload for dashboard
+                  });
+                } else {
+                  this.checkProfileCompletion(data.username, data.role);
+                }
+              });
+            });
+          }
+        },
+        error: (err) => {
+          let errorMessage = 'Google sign-in failed';
+          
+          if (err.status === 404) {
+            errorMessage = 'No account found with this Google email. Please register first.';
+          } else if (err.status === 403) {
+            errorMessage = 'Please complete email verification from registration first.';
+          } else if (err.error?.message) {
+            errorMessage = err.error.message;
+          }
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Sign-In Failed',
+            text: errorMessage,
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
+    }
   }
 
   onLogin(): void {
@@ -52,7 +168,6 @@ export class LoginComponent implements OnInit {
           this.authService.saveToken(data.token);
           this.authService.setUsername(data.username);
 
-          // ✅ FIXED: Skip profile check for ADMIN
           if (data.role === 'ADMIN') {
             Swal.fire({
               icon: 'success',
@@ -64,7 +179,6 @@ export class LoginComponent implements OnInit {
               this.router.navigateByUrl('/admin-dashboard');
             });
           } else {
-            // For other roles, check profile completion
             this.checkProfileCompletion(data.username, data.role);
           }
 
@@ -88,12 +202,10 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // ✅ Profile completion check (only for non-ADMIN users)
   checkProfileCompletion(username: string, role: string): void {
     this.httpService.checkDetailsCompletion(username, role).subscribe({
       next: (response: any) => {
         if (response.detailsCompleted) {
-          // Profile complete - go to dashboard
           Swal.fire({
             icon: 'success',
             title: 'Login Successful',
@@ -104,7 +216,6 @@ export class LoginComponent implements OnInit {
             this.router.navigateByUrl('/dashboard');
           });
         } else {
-          // Profile incomplete - show prompt
           Swal.fire({
             icon: 'info',
             title: 'Complete Your Profile',
@@ -116,7 +227,6 @@ export class LoginComponent implements OnInit {
             cancelButtonColor: '#6c757d'
           }).then((result: any) => {
             if (result.isConfirmed) {
-              // Redirect to user details page
               this.router.navigate(['/user-details'], {
                 queryParams: {
                   username: username,
@@ -124,14 +234,12 @@ export class LoginComponent implements OnInit {
                 }
               });
             } else {
-              // Allow access but remind later
               this.router.navigateByUrl('/dashboard');
             }
           });
         }
       },
       error: () => {
-        // If check fails, allow login anyway
         Swal.fire({
           icon: 'success',
           title: 'Login Successful',

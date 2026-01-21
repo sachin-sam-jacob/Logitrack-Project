@@ -14,6 +14,13 @@
       <h2>Welcome Back 👋</h2>
       <p>Please login to continue</p>
 
+      <!-- Google Sign-In Button Container -->
+      <div id="googleSignInButton" style="margin-bottom: 20px; width: 100%;"></div>
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
+
       <form [formGroup]="itemForm" (ngSubmit)="onLogin()">
         <div class="input-group">
           <label>Username</label>
@@ -32,10 +39,9 @@
       </form>
 
       <p class="switch-link">
-        Don’t have an account?
+        Don't have an account?
         <span routerLink="/registration">Sign up</span>
       </p>
     </div>
   </div>
 </div>
-

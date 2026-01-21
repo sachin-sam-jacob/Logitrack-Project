@@ -56,6 +56,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/resend-otp").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/verify-otp").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/create-admin").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/google-signin").permitAll()
 
                 // User details endpoints
                 .antMatchers(HttpMethod.POST, "/api/user-details/business").permitAll()

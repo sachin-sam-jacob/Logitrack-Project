@@ -87,11 +87,12 @@ export class HttpService {
   }
 
   toggleDriverAvailability(username: string): Observable<any> {
-    return this.http.post(
-      `${this.serverName}/api/user-details/driver/toggle-availability?username=${username}`,
-      {headers: this.getHeaders()}
-    );
-  }
+  return this.http.post(
+    `${this.serverName}/api/user-details/driver/toggle-availability?username=${username}`,
+    {},
+    { headers: this.getHeaders() }  // Make sure headers are included
+  );
+}
 
   // ==================== BUSINESS (CARGO & DRIVERS) ====================
   addCargo(details: any): Observable<any> {
@@ -322,6 +323,14 @@ resetPassword(payload: { username: string; newPassword: string }) {
     `${this.serverName}/api/forgot-password/reset`,
     payload,
     { headers }
+  );
+}
+
+
+googleSignIn(credential: string): Observable<any> {
+  return this.http.post(`${this.serverName}/api/google-signin`, 
+    { credential },
+    { headers: new HttpHeaders().set('Content-Type', 'application/json') }
   );
 }
 

@@ -49,20 +49,23 @@
       </div>
     </div>
 
-    <!-- Driver Availability Toggle -->
-    <div *ngIf="role === 'DRIVER' && verificationStatus === 'APPROVED'" class="availability-toggle">
-      <label class="toggle-switch">
-        <input 
-          type="checkbox" 
-          [checked]="isAvailable" 
-          (change)="toggleAvailability()" 
-        />
-        <span class="slider"></span>
-      </label>
-      <span class="toggle-label">
-        {{ isAvailable ? '✅ Available for assignments' : '❌ Unavailable' }}
-      </span>
-    </div>
+   <div *ngIf="role === 'DRIVER' && verificationStatus === 'APPROVED'" class="availability-toggle">
+  <label class="toggle-switch">
+    <input 
+      type="checkbox" 
+      [checked]="isAvailable" 
+      (change)="toggleAvailability()" 
+      [disabled]="hasActiveDelivery"
+    />
+    <span class="slider" [class.disabled]="hasActiveDelivery"></span>
+    </label>
+    <span class="toggle-label">
+      {{ isAvailable ? '✅ Available for assignments' : '❌ Unavailable' }}
+    </span>
+    <p *ngIf="hasActiveDelivery" class="toggle-hint">
+      ⚠️ Complete your current delivery to change availability
+    </p>
+  </div>
 
     <!-- BUSINESS FORM -->
     <form *ngIf="role === 'BUSINESS'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">

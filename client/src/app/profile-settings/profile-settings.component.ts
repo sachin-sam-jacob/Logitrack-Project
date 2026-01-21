@@ -18,7 +18,7 @@ export class ProfileSettingsComponent implements OnInit {
   isSubmitting = false;
   detailsCompleted = false;
   isLoading = true;
-
+  hasActiveDelivery:boolean=false;
   // File uploads
   licenseProofBase64: string = '';
   vehicleRcBase64: string = '';
@@ -115,7 +115,7 @@ export class ProfileSettingsComponent implements OnInit {
           this.isAvailable = data.available || false;
           this.baseLocation = data.baseLocation || '';
           this.currentLocation = data.currentLocation || data.baseLocation || '';
-          
+          this.checkActiveDeliveries();
           console.log('Driver details loaded:', {
             verificationStatus: this.verificationStatus,
             isAvailable: this.isAvailable,
@@ -245,47 +245,57 @@ export class ProfileSettingsComponent implements OnInit {
   }
 
   toggleAvailability() {
-    if (this.role !== 'DRIVER') {
-      console.error('Toggle availability called for non-driver role');
-      return;
-    }
+  if (this.role !== 'DRIVER') return;
 
-    if (this.verificationStatus !== 'APPROVED') {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Not Approved',
-        text: 'Only approved drivers can change availability',
-        confirmButtonColor: '#f59e0b'
-      });
-      return;
-    }
-
-    console.log('Toggling availability for:', this.username);
-
-    this.httpService.toggleDriverAvailability(this.username).subscribe({
-      next: (res: any) => {
-        this.isAvailable = res.isAvailable;
-        console.log('Availability toggled to:', this.isAvailable);
-        
-        Swal.fire({
-          icon: 'success',
-          title: 'Availability Updated',
-          text: `You are now ${this.isAvailable ? 'available' : 'unavailable'} for assignments`,
-          timer: 2000,
-          showConfirmButton: false
-        });
-      },
-      error: (err) => {
-        console.error('Toggle availability error:', err);
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: err.error?.message || 'Failed to update availability',
-          confirmButtonColor: '#ef4444'
-        });
-      }
+  // Check if driver is approved
+  if (this.verificationStatus !== 'APPROVED') {
+    Swal.fire({
+      icon: 'warning',
+      title: 'Not Approved',
+      text: 'Only approved drivers can change availability',
+      confirmButtonColor: '#d33'
     });
+    return;
   }
+
+  this.httpService.toggleDriverAvailability(this.username).subscribe({
+    next: (res: any) => {
+      this.isAvailable = res.isAvailable;
+      
+      const statusText = this.isAvailable ? 'available' : 'unavailable';
+      const icon = this.isAvailable ? 'success' : 'info';
+      
+      Swal.fire({
+        icon: icon,
+        title: 'Availability Updated',
+        text: `You are now ${statusText} for assignments`,
+        timer: 2000,
+        showConfirmButton: false
+      });
+      
+      // Reload details to ensure sync
+      this.loadExistingDetails();
+    },
+    error: (err) => {
+      console.error('Toggle availability error:', err);
+      
+      let errorMessage = 'Failed to update availability. Please try again.';
+      if (err.error?.message) {
+        errorMessage = err.error.message;
+      }
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: errorMessage,
+        confirmButtonColor: '#d33'
+      });
+      
+      // Reload to get correct state
+      this.loadExistingDetails();
+    }
+  });
+}
 
   private formatFieldName(field: string): string {
     return field
@@ -293,4 +303,23 @@ export class ProfileSettingsComponent implements OnInit {
       .replace(/^./, str => str.toUpperCase())
       .trim();
   }
+
+  private checkActiveDeliveries(): void {
+  const driverId = this.authService.getId;
+  if (!driverId) return;
+  
+  this.httpService.getAssignOrders(driverId).subscribe({
+    next: (cargos: any[]) => {
+      this.hasActiveDelivery = cargos.some(c => 
+        c.status === 'ACCEPTED' || 
+        c.status === 'PICKED_UP' || 
+        c.status === 'IN_TRANSIT' ||
+        c.status === 'AWAITING_OTP'
+      );
+    },
+    error: () => {
+      this.hasActiveDelivery = false;
+    }
+  });
+}
 }

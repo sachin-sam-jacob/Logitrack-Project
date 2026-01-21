@@ -8,11 +8,14 @@ import com.edutech.logisticsmanagementandtrackingsystem.dto.CargoStatusResponse;
 import com.edutech.logisticsmanagementandtrackingsystem.dto.CustomerDetailsRequest;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Cargo;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.Customer;
+import com.edutech.logisticsmanagementandtrackingsystem.entity.Driver;
 import com.edutech.logisticsmanagementandtrackingsystem.entity.User;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CargoRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.CustomerRepository;
+import com.edutech.logisticsmanagementandtrackingsystem.repository.DriverRepository;
 import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
  
@@ -30,6 +33,9 @@ public class CustomerService {
     
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private DriverRepository driverRepository;
  
     public Customer createCustomer(Customer customer) {
         return customerRepository.save(customer);
@@ -88,25 +94,35 @@ public class CustomerService {
      * UPDATED: Verify delivery OTP and notify business
      */
     public boolean verifyDeliveryOtp(Long cargoId, String otp) {
-        Cargo cargo = cargoRepository.findById(cargoId)
-                .orElseThrow(() -> new EntityNotFoundException("Cargo not found"));
+    Cargo cargo = cargoRepository.findById(cargoId)
+            .orElseThrow(() -> new EntityNotFoundException("Cargo not found"));
 
-        if (cargo.getDeliveryOtp() != null && cargo.getDeliveryOtp().equals(otp)) {
-            cargo.setOtpVerified(true);
-            cargo.setStatus("DELIVERED");
-            cargoRepository.save(cargo);
-            
-            // ADDED: Send delivery completion email to business
-            try {
-                emailService.sendDeliveryCompletionToBusiness(cargo);
-            } catch (Exception e) {
-                System.err.println("Failed to send delivery completion email to business: " + e.getMessage());
-            }
-            
-            return true;
+    if (cargo.getDeliveryOtp() != null && cargo.getDeliveryOtp().equals(otp)) {
+        cargo.setOtpVerified(true);
+        cargo.setStatus("DELIVERED");
+        cargo.setActualDeliveryDate(LocalDateTime.now());
+        
+        // Make driver available again after successful delivery
+        Driver driver = cargo.getDriver();
+        if (driver != null) {
+            driver.setCurrentLocation(cargo.getDestinationLocation());
+            driver.setAvailable(true); // Driver becomes available after delivery
+            driverRepository.save(driver);
         }
-        return false;
+        
+        cargoRepository.save(cargo);
+        
+        // Send delivery completion email to business
+        try {
+            emailService.sendDeliveryCompletionToBusiness(cargo);
+        } catch (Exception e) {
+            System.err.println("Failed to send delivery completion email to business: " + e.getMessage());
+        }
+        
+        return true;
     }
+    return false;
+}
 
     public Customer updateCustomerDetails(CustomerDetailsRequest request) {
         User user = userRepository.findByUsername(request.getUsername());

@@ -28,6 +28,9 @@ import com.edutech.logisticsmanagementandtrackingsystem.service.CustomerService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.DriverService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.OtpService;
 import com.edutech.logisticsmanagementandtrackingsystem.service.UserService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.edutech.logisticsmanagementandtrackingsystem.service.GoogleOAuthService;
+import com.edutech.logisticsmanagementandtrackingsystem.dto.GoogleSignInRequest;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +67,9 @@ public class RegisterAndLoginController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private GoogleOAuthService googleOAuthService;
 
     // REGISTER - FIXED
     @PostMapping("/register")  
@@ -266,4 +272,56 @@ if (purpose == null || purpose.equalsIgnoreCase("REGISTER")) {
             return ResponseEntity.ok(Map.of("valid", false));
         }
     }
+
+
+    @PostMapping("/google-signin")
+public ResponseEntity<?> googleSignIn(@RequestBody GoogleSignInRequest request) {
+    try {
+        // Verify Google token
+        GoogleIdToken.Payload payload = googleOAuthService.verifyGoogleToken(request.getCredential());
+        
+        String email = payload.getEmail();
+        boolean emailVerified = payload.getEmailVerified();
+        
+        if (!emailVerified) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Google email not verified");
+            return ResponseEntity.badRequest().body(error);
+        }
+        
+        // Find user by email
+        User user = userRepository.findByEmail(email);
+        
+        if (user == null) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "No account found with this email. Please register first.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        }
+        
+        // Check if user completed email verification during registration
+        if (!user.isEmailVerified()) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Please complete email verification from registration first");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+        }
+        
+        // Generate JWT token
+        final String token = jwtUtil.generateToken(user.getUsername());
+        
+        return ResponseEntity.ok(
+            new LoginResponse(
+                token,
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getId()
+            )
+        );
+        
+    } catch (Exception e) {
+        Map<String, String> error = new HashMap<>();
+        error.put("message", "Google sign-in failed: " + e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+}
 }

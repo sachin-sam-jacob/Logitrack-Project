@@ -261,7 +261,7 @@ public class DriverService {
     /**
      * Toggle availability - ONLY for approved drivers
      */
-   public Driver toggleAvailability(String username) {
+  public Driver toggleAvailability(String username) {
     Driver driver = driverRepository.findByName(username);
     if (driver == null) {
         throw new RuntimeException("Driver not found");
@@ -269,6 +269,22 @@ public class DriverService {
 
     if (!"APPROVED".equals(driver.getVerificationStatus())) {
         throw new RuntimeException("Only approved drivers can change availability");
+    }
+
+    // Check if driver has any active assignments
+    List<Cargo> activeCargos = cargoRepository.findByDriverId(driver.getId())
+            .stream()
+            .filter(c -> {
+                String status = c.getStatus();
+                return "ACCEPTED".equals(status) || 
+                       "PICKED_UP".equals(status) || 
+                       "IN_TRANSIT".equals(status) ||
+                       "AWAITING_OTP".equals(status);
+            })
+            .collect(Collectors.toList());
+
+    if (!activeCargos.isEmpty()) {
+        throw new RuntimeException("Cannot change availability while you have active deliveries. Please complete your current delivery first.");
     }
 
     // Toggle the availability

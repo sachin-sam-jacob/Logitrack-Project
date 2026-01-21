@@ -8,7 +8,7 @@
 
 .auth-card {
   width: 900px;
-  height: 520px;
+  height: 600px;
   background: #ffffff;
   border-radius: 18px;
   display: flex;
@@ -40,7 +40,39 @@
 
 .auth-right p {
   color: #666;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+}
+
+// Google Sign-In Button Container
+#g_id_onload {
+  margin-bottom: 10px;
+}
+
+.g_id_signin {
+  margin-bottom: 20px;
+  width: 100% !important;
+}
+
+// Divider
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0;
+  
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  span {
+    padding: 0 15px;
+    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+  }
 }
 
 .input-group {

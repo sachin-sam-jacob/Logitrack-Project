@@ -151,31 +151,31 @@ public class CargoService {
      * ACCEPT CARGO BY DRIVER
      */
     public Cargo acceptCargoByDriver(Long cargoId) {
-        Cargo cargo = cargoRepo.findById(cargoId)
-                .orElseThrow(() -> new EntityNotFoundException("Cargo not found"));
+    Cargo cargo = cargoRepo.findById(cargoId)
+            .orElseThrow(() -> new EntityNotFoundException("Cargo not found"));
 
-        if (!"ASSIGNED".equals(cargo.getStatus())) {
-            throw new RuntimeException("Cargo is not in ASSIGNED status");
-        }
-
-        cargo.setStatus("ACCEPTED");
-        
-        Driver driver = cargo.getDriver();
-        if (driver != null) {
-            driver.setAvailable(false);
-            driverRepo.save(driver);
-        }
-
-        Cargo savedCargo = cargoRepo.save(cargo);
-        
-        try {
-            emailService.sendCargoAcceptedEmail(savedCargo);
-        } catch (Exception e) {
-            System.err.println("Failed to send accepted email: " + e.getMessage());
-        }
-        
-        return savedCargo;
+    if (!"ASSIGNED".equals(cargo.getStatus())) {
+        throw new RuntimeException("Cargo is not in ASSIGNED status");
     }
+
+    cargo.setStatus("ACCEPTED");
+    
+    Driver driver = cargo.getDriver();
+    if (driver != null) {
+        driver.setAvailable(false); // Set to BUSY when accepting cargo
+        driverRepo.save(driver);
+    }
+
+    Cargo savedCargo = cargoRepo.save(cargo);
+    
+    try {
+        emailService.sendCargoAcceptedEmail(savedCargo);
+    } catch (Exception e) {
+        System.err.println("Failed to send accepted email: " + e.getMessage());
+    }
+    
+    return savedCargo;
+}
 
     /**
      * REJECT CARGO BY DRIVER
