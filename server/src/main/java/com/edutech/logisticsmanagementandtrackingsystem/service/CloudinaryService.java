@@ -13,8 +13,14 @@ import java.util.UUID;
 @Service
 public class CloudinaryService {
 
+
+ private final Cloudinary cloudinary;
+
     @Autowired
-    private Cloudinary cloudinary;
+    public CloudinaryService(Cloudinary cloudinary) {
+        this.cloudinary = cloudinary;
+    }
+
 
     /**
      * Upload Base64 image to Cloudinary

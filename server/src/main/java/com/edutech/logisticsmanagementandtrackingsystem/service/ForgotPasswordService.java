@@ -11,14 +11,20 @@ import java.util.Optional;
 @Service
 public class ForgotPasswordService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+   
+private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final OtpService otpService;
 
     @Autowired
-    private UserRepository userRepository; // field injection (as requested)
+    public ForgotPasswordService(PasswordEncoder passwordEncoder,
+                                 UserRepository userRepository,
+                                 OtpService otpService) {
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.otpService = otpService;
+    }
 
-    @Autowired
-    private OtpService otpService; // you already have this; takes User
 
     public boolean existsByEmail(String email) {
         if (email == null || email.trim().isEmpty()) return false;

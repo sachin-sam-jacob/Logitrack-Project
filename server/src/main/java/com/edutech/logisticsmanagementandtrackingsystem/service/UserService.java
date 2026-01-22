@@ -14,11 +14,17 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepositor
 @Service
 public class UserService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+   
+ private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     public User registerUser(User user) {
         User existingUser = userRepository.findByUsername(user.getUsername());
