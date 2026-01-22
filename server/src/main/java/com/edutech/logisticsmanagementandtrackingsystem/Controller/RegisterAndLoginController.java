@@ -41,35 +41,41 @@ import org.springframework.security.authentication.BadCredentialsException;
 @RequestMapping("/api")
 public class RegisterAndLoginController {
 
-    @Autowired  
-    private UserService userService;  
 
-    @Autowired  
-    private OtpService otpService;  
-
-    @Autowired  
-    private BusinessService businessService;  
-
-    @Autowired  
-    private CustomerService customerService;  
-
-    @Autowired  
-    private DriverService driverService;  
-
-    @Autowired  
-    private AuthenticationManager authenticationManager;  
-
-    @Autowired  
-    private JwtUtil jwtUtil;  
+    private final UserService userService;
+    private final OtpService otpService;
+    private final BusinessService businessService;
+    private final CustomerService customerService;
+    private final DriverService driverService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final GoogleOAuthService googleOAuthService;
 
     @Autowired
-    private UserRepository userRepository;
+    public RegisterAndLoginController(UserService userService,
+                          OtpService otpService,
+                          BusinessService businessService,
+                          CustomerService customerService,
+                          DriverService driverService,
+                          AuthenticationManager authenticationManager,
+                          JwtUtil jwtUtil,
+                          UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
+                          GoogleOAuthService googleOAuthService) {
+        this.userService = userService;
+        this.otpService = otpService;
+        this.businessService = businessService;
+        this.customerService = customerService;
+        this.driverService = driverService;
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.googleOAuthService = googleOAuthService;
+    }
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private GoogleOAuthService googleOAuthService;
 
     // REGISTER - FIXED
     @PostMapping("/register")  

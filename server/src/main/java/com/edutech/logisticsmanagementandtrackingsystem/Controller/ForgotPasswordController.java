@@ -14,8 +14,13 @@ import java.util.Map;
 @CrossOrigin
 public class ForgotPasswordController {
 
+
+ private final ForgotPasswordService forgotPasswordService;
+
     @Autowired
-    private ForgotPasswordService forgotPasswordService;
+    public ForgotPasswordController(ForgotPasswordService forgotPasswordService) {
+        this.forgotPasswordService = forgotPasswordService;
+    }
 
     @PostMapping("/check")
     public ResponseEntity<Map<String, Boolean>> check(@RequestBody EmailRequest req) {
