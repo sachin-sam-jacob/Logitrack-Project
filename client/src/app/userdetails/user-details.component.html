@@ -1,187 +1,214 @@
 <div class="details-container">
+  <!-- Particle Canvas Background -->
+  <canvas #particleCanvas class="particle-canvas"></canvas>
+
+  <button class="back-home-btn" routerLink="/dashboard">
+    <span>←</span> Back to Dashboard
+  </button>
+
   <div class="details-card">
-    
-    <div class="header">
-      <h2>Complete Your Profile</h2>
-      <p>Please provide additional details to complete your registration</p>
+    <!-- Left Illustration -->
+    <div class="details-left">
+      <div class="illustration-wrapper">
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3712/3712207.png"
+          alt="Profile Setup"
+        />
+        <div class="role-badge">{{ role }}</div>
+      </div>
+      <h3>Complete Your Profile</h3>
+      <p>Just a few more steps to get started</p>
     </div>
 
-    <!-- BUSINESS FORM -->
-    <form *ngIf="role === 'BUSINESS'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
-      
-      <div class="input-group">
-        <label>Business Name <span class="required">*</span></label>
-        <input type="text" formControlName="businessName" placeholder="Enter your business name" />
-        <small class="error" *ngIf="detailsForm.get('businessName')?.invalid && detailsForm.get('businessName')?.touched">
-          Business name is required
-        </small>
+    <!-- Right Form -->
+    <div class="details-right">
+      <div class="form-header">
+        <h2>{{ role }} Details</h2>
+        <p>Provide your information to complete registration</p>
       </div>
 
-      <div class="input-group">
-        <label>Location <span class="required">*</span></label>
-        <input type="text" formControlName="location" placeholder="City, State" />
-        <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
-          Location is required
-        </small>
-      </div>
+      <div class="form-scroll">
+        <!-- BUSINESS FORM -->
+        <form *ngIf="role === 'BUSINESS'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
+          
+          <div class="input-group">
+            <label>Business Name <span class="required">*</span></label>
+            <input type="text" formControlName="businessName" placeholder="Enter your business name" />
+            <small class="error" *ngIf="detailsForm.get('businessName')?.invalid && detailsForm.get('businessName')?.touched">
+              Business name is required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Contact Number <span class="required">*</span></label>
-        <input type="tel" formControlName="contactNumber" placeholder="10-digit mobile number" maxlength="10" />
-        <small class="error" *ngIf="detailsForm.get('contactNumber')?.invalid && detailsForm.get('contactNumber')?.touched">
-          Valid 10-digit number required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Location <span class="required">*</span></label>
+            <input type="text" formControlName="location" placeholder="City, State" />
+            <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
+              Location is required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Business Type <span class="required">*</span></label>
-        <select formControlName="businessType">
-          <option value="">Select Type</option>
-          <option value="Retail">Retail</option>
-          <option value="Manufacturing">Manufacturing</option>
-          <option value="Logistics">Logistics</option>
-          <option value="E-commerce">E-commerce</option>
-          <option value="Other">Other</option>
-        </select>
-        <small class="error" *ngIf="detailsForm.get('businessType')?.invalid && detailsForm.get('businessType')?.touched">
-          Please select business type
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Contact Number <span class="required">*</span></label>
+            <input type="tel" formControlName="contactNumber" placeholder="10-digit mobile number" maxlength="10" />
+            <small class="error" *ngIf="detailsForm.get('contactNumber')?.invalid && detailsForm.get('contactNumber')?.touched">
+              Valid 10-digit number required
+            </small>
+          </div>
 
-      <div class="button-group">
-        <button type="submit" class="btn primary-btn" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Submitting...' : 'Submit Details' }}
-        </button>
-        <button type="button" class="btn secondary-btn" (click)="skipForNow()">
-          Skip for Now
-        </button>
-      </div>
-    </form>
-    
-    <!-- DRIVER FORM -->
-    <form *ngIf="role === 'DRIVER'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
-      
-      <div class="input-group">
-        <label>License Number <span class="required">*</span></label>
-        <input type="text" formControlName="licenseNumber" placeholder="Enter your license number" />
-        <small class="error" *ngIf="detailsForm.get('licenseNumber')?.invalid && detailsForm.get('licenseNumber')?.touched">
-          License number is required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Business Type <span class="required">*</span></label>
+            <select formControlName="businessType">
+              <option value="">Select Type</option>
+              <option value="Retail">Retail</option>
+              <option value="Manufacturing">Manufacturing</option>
+              <option value="Logistics">Logistics</option>
+              <option value="E-commerce">E-commerce</option>
+              <option value="Other">Other</option>
+            </select>
+            <small class="error" *ngIf="detailsForm.get('businessType')?.invalid && detailsForm.get('businessType')?.touched">
+              Please select business type
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Vehicle Type <span class="required">*</span></label>
-        <select formControlName="vehicleType">
-          <option value="">Select Vehicle Type</option>
-          <option value="Bike">Bike</option>
-          <option value="Van">Van</option>
-          <option value="Truck">Truck</option>
-          <option value="Mini Truck">Mini Truck</option>
-        </select>
-        <small class="error" *ngIf="detailsForm.get('vehicleType')?.invalid && detailsForm.get('vehicleType')?.touched">
-          Vehicle type is required
-        </small>
-      </div>
+          <div class="button-group">
+            <button type="submit" class="btn primary-btn" [disabled]="isSubmitting">
+              {{ isSubmitting ? 'Submitting...' : 'Complete Setup' }}
+            </button>
+            <button type="button" class="btn secondary-btn" (click)="skipForNow()">
+              Skip for Now
+            </button>
+          </div>
+        </form>
+        
+        <!-- DRIVER FORM -->
+        <form *ngIf="role === 'DRIVER'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
+          
+          <div class="input-group">
+            <label>License Number <span class="required">*</span></label>
+            <input type="text" formControlName="licenseNumber" placeholder="Enter your license number" />
+            <small class="error" *ngIf="detailsForm.get('licenseNumber')?.invalid && detailsForm.get('licenseNumber')?.touched">
+              License number is required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Vehicle Number <span class="required">*</span></label>
-        <input type="text" formControlName="vehicleNumber" placeholder="TN01AB1234" />
-        <small class="error" *ngIf="detailsForm.get('vehicleNumber')?.invalid && detailsForm.get('vehicleNumber')?.touched">
-          Vehicle number is required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Vehicle Type <span class="required">*</span></label>
+            <select formControlName="vehicleType">
+              <option value="">Select Vehicle Type</option>
+              <option value="Bike">Bike</option>
+              <option value="Van">Van</option>
+              <option value="Truck">Truck</option>
+              <option value="Mini Truck">Mini Truck</option>
+            </select>
+            <small class="error" *ngIf="detailsForm.get('vehicleType')?.invalid && detailsForm.get('vehicleType')?.touched">
+              Vehicle type is required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Contact Number <span class="required">*</span></label>
-        <input type="tel" formControlName="contactNumber" placeholder="10-digit mobile number" maxlength="10" />
-        <small class="error" *ngIf="detailsForm.get('contactNumber')?.invalid && detailsForm.get('contactNumber')?.touched">
-          Valid 10-digit number required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Vehicle Number <span class="required">*</span></label>
+            <input type="text" formControlName="vehicleNumber" placeholder="TN01AB1234" />
+            <small class="error" *ngIf="detailsForm.get('vehicleNumber')?.invalid && detailsForm.get('vehicleNumber')?.touched">
+              Vehicle number is required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Location <span class="required">*</span></label>
-        <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
-        <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
-          Location is required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Contact Number <span class="required">*</span></label>
+            <input type="tel" formControlName="contactNumber" placeholder="10-digit mobile number" maxlength="10" />
+            <small class="error" *ngIf="detailsForm.get('contactNumber')?.invalid && detailsForm.get('contactNumber')?.touched">
+              Valid 10-digit number required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Upload License Proof <span class="required">*</span></label>
-        <div class="file-upload">
-          <input type="file" (change)="onFileChange($event, 'license')" accept="image/*,.pdf" id="license" />
-          <label for="license" class="file-label">
-            {{ licenseProofName || 'Choose File' }}
-          </label>
-        </div>
-      </div>
+          <div class="input-group">
+            <label>Base Location <span class="required">*</span></label>
+            <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
+            <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
+              Location is required
+            </small>
+            <small class="info-text">
+              ℹ️ This is your primary operating location
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Upload Vehicle RC <span class="required">*</span></label>
-        <div class="file-upload">
-          <input type="file" (change)="onFileChange($event, 'rc')" accept="image/*,.pdf" id="rc" />
-          <label for="rc" class="file-label">
-            {{ vehicleRcName || 'Choose File' }}
-          </label>
-        </div>
-      </div>
+          <div class="input-group">
+            <label>Upload License Proof <span class="required">*</span></label>
+            <div class="file-upload">
+              <input type="file" (change)="onFileChange($event, 'license')" accept="image/*,.pdf" id="license" />
+              <label for="license" class="file-label">
+                <span class="file-icon">📄</span>
+                <span class="file-text">{{ licenseProofName || 'Choose File' }}</span>
+              </label>
+            </div>
+          </div>
 
-      <div class="button-group">
-        <button type="submit" class="btn primary-btn" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Submitting...' : 'Submit Details' }}
-        </button>
-        <button type="button" class="btn secondary-btn" (click)="skipForNow()">
-          Skip for Now
-        </button>
-      </div>
-    </form>
+          <div class="input-group">
+            <label>Upload Vehicle RC <span class="required">*</span></label>
+            <div class="file-upload">
+              <input type="file" (change)="onFileChange($event, 'rc')" accept="image/*,.pdf" id="rc" />
+              <label for="rc" class="file-label">
+                <span class="file-icon">📄</span>
+                <span class="file-text">{{ vehicleRcName || 'Choose File' }}</span>
+              </label>
+            </div>
+          </div>
 
-    <!-- CUSTOMER FORM - FIXED -->
-    <form *ngIf="role === 'CUSTOMER'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
-      
-      <div class="input-group">
-        <label>Contact Number <span class="required">*</span></label>
-        <input type="tel" formControlName="contactNumber" placeholder="10-digit mobile number" maxlength="10" />
-        <small class="error" *ngIf="detailsForm.get('contactNumber')?.invalid && detailsForm.get('contactNumber')?.touched">
-          Valid 10-digit number required
-        </small>
-      </div>
+          <div class="button-group">
+            <button type="submit" class="btn primary-btn" [disabled]="isSubmitting">
+              {{ isSubmitting ? 'Submitting...' : 'Complete Setup' }}
+            </button>
+            <button type="button" class="btn secondary-btn" (click)="skipForNow()">
+              Skip for Now
+            </button>
+          </div>
+        </form>
 
-      <div class="input-group">
-        <label>Alternative Contact Number <span class="required">*</span></label>
-        <input type="tel" formControlName="alternativeContactNumber" placeholder="Alternate 10-digit number" maxlength="10" />
-        <small class="error" *ngIf="detailsForm.get('alternativeContactNumber')?.invalid && detailsForm.get('alternativeContactNumber')?.touched">
-          Valid 10-digit number required
-        </small>
-      </div>
+        <!-- CUSTOMER FORM -->
+        <form *ngIf="role === 'CUSTOMER'" [formGroup]="detailsForm" (ngSubmit)="onSubmit()">
+          
+          <div class="input-group">
+            <label>Contact Number <span class="required">*</span></label>
+            <input type="tel" formControlName="contactNumber" placeholder="10-digit mobile number" maxlength="10" />
+            <small class="error" *ngIf="detailsForm.get('contactNumber')?.invalid && detailsForm.get('contactNumber')?.touched">
+              Valid 10-digit number required
+            </small>
+          </div>
 
-      <div class="input-group">
-        <label>Address <span class="required">*</span></label>
-        <textarea formControlName="address" rows="3" placeholder="Enter your full address"></textarea>
-        <small class="error" *ngIf="detailsForm.get('address')?.invalid && detailsForm.get('address')?.touched">
-          Address is required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Alternative Contact Number <span class="required">*</span></label>
+            <input type="tel" formControlName="alternativeContactNumber" placeholder="Alternate 10-digit number" maxlength="10" />
+            <small class="error" *ngIf="detailsForm.get('alternativeContactNumber')?.invalid && detailsForm.get('alternativeContactNumber')?.touched">
+              Valid 10-digit number required
+            </small>
+          </div>
 
-      <!-- ADDED LOCATION FIELD -->
-      <div class="input-group">
-        <label>Location <span class="required">*</span></label>
-        <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
-        <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
-          Location is required
-        </small>
-      </div>
+          <div class="input-group">
+            <label>Address <span class="required">*</span></label>
+            <textarea formControlName="address" rows="3" placeholder="Enter your full address"></textarea>
+            <small class="error" *ngIf="detailsForm.get('address')?.invalid && detailsForm.get('address')?.touched">
+              Address is required
+            </small>
+          </div>
 
-      <div class="button-group">
-        <button type="submit" class="btn primary-btn" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'Submitting...' : 'Submit Details' }}
-        </button>
-        <button type="button" class="btn secondary-btn" (click)="skipForNow()">
-          Skip for Now
-        </button>
-      </div>
-    </form>
+          <div class="input-group">
+            <label>Location <span class="required">*</span></label>
+            <input type="text" formControlName="location" placeholder="City/Area (e.g., Chennai, Tamil Nadu)" />
+            <small class="error" *ngIf="detailsForm.get('location')?.invalid && detailsForm.get('location')?.touched">
+              Location is required
+            </small>
+          </div>
 
+          <div class="button-group">
+            <button type="submit" class="btn primary-btn" [disabled]="isSubmitting">
+              {{ isSubmitting ? 'Submitting...' : 'Complete Setup' }}
+            </button>
+            <button type="button" class="btn secondary-btn" (click)="skipForNow()">
+              Skip for Now
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>

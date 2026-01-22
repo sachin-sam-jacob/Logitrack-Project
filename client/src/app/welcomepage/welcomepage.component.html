@@ -1,57 +1,317 @@
 <div class="landing-container">
+  <!-- Animated Background Elements -->
+  <div class="bg-grid"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+  
+  <!-- Stars -->
+  <div class="stars">
+    <div class="star" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+    <div class="star" style="top: 20%; left: 80%; animation-delay: 0.5s;"></div>
+    <div class="star" style="top: 60%; left: 10%; animation-delay: 1s;"></div>
+    <div class="star" style="top: 70%; left: 85%; animation-delay: 1.5s;"></div>
+    <div class="star" style="top: 30%; left: 50%; animation-delay: 2s;"></div>
+  </div>
+
   <nav class="navbar">
-    <div class="logo">LogiTrack</div>
+    <div class="logo">
+      <div class="logo-wrapper">
+        <span class="logo-icon">🚚</span>
+        <div class="logo-text">
+          <span class="logo-main">LogiTrack</span>
+          <!-- <span class="logo-tagline">Pro</span> -->
+        </div>
+      </div>
+    </div>
     <div class="nav-actions">
-      <button routerLink="/login" class="nav-btn login">Login</button>
-      <button routerLink="/registration" class="nav-btn signup">Sign Up</button>
+      <button routerLink="/login" class="nav-btn login">
+        <span class="btn-icon">👤</span>
+        Login
+      </button>
+      <button routerLink="/registration" class="nav-btn signup">
+        <span class="btn-icon">✨</span>
+        Sign Up
+        <div class="btn-glow"></div>
+      </button>
     </div>
   </nav>
 
   <section class="hero-section">
     <div class="hero-content">
-      <h1>
-        Smart Logistics <br />
-        <span>Made Simple</span>
+      <div class="badge fade-in-up">
+        <span class="badge-icon">⚡</span>
+        Next-Gen Logistics Platform
+      </div>
+      
+      <h1 class="fade-in-up delay-1">
+        <span class="gradient-text">Smart Logistics</span>
+        <br />
+        Made <span class="highlight-text">Simple</span>
       </h1>
-      <p>
-        Manage cargos, assign drivers, and track deliveries in real time
-        with a secure and scalable logistics platform.
+      
+      <p class="fade-in-up delay-2">
+        Transform your delivery operations with AI-powered routing, 
+        real-time tracking, and seamless driver management.
       </p>
 
-      <div class="hero-buttons">
+      <div class="stats-row fade-in-up delay-3">
+        <div class="stat-item">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Deliveries</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Drivers</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <div class="stat-number">99.9%</div>
+          <div class="stat-label">Uptime</div>
+        </div>
+      </div>
+
+      <div class="hero-buttons fade-in-up delay-4">
         <button routerLink="/registration" class="btn primary-btn">
-          Get Started
+          <span>Get Started Free</span>
+          <span class="btn-arrow">→</span>
+          <div class="btn-shine"></div>
         </button>
-        <button routerLink="/login" class="btn secondary-btn">
-          Login
-        </button>
+        <!-- <button routerLink="/login" class="btn secondary-btn">
+          <span class="btn-icon-lg">▶</span>
+          Watch Demo
+        </button> -->
+      </div>
+
+      <div class="trust-badges fade-in-up delay-5">
+        <span class="trust-item">🔒 Bank-level Security</span>
+        <span class="trust-item">⚡ Lightning Fast</span>
+        <span class="trust-item">📱 Mobile Ready</span>
       </div>
     </div>
 
-    <div class="hero-image">
-      <img
-        src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png"
-        alt="Logistics Illustration"
-      />
+    <div class="hero-image-container">
+      <!-- Cityscape background -->
+      <div class="cityscape">
+        <div class="building building-1"></div>
+        <div class="building building-2"></div>
+        <div class="building building-3"></div>
+        <div class="building building-4"></div>
+        <div class="building building-5"></div>
+      </div>
+      
+      <!-- Road with enhanced markings -->
+      <div class="road">
+        <div class="road-edge top-edge"></div>
+        <div class="lane-marking"></div>
+        <div class="lane-marking"></div>
+        <div class="lane-marking"></div>
+        <div class="lane-marking"></div>
+        <div class="road-edge bottom-edge"></div>
+      </div>
+      
+      <!-- Delivery Van with enhanced effects -->
+      <div class="delivery-van">
+        <svg class="van-svg" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="vanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
+            </linearGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+          
+          <!-- Shadow -->
+          <ellipse cx="100" cy="85" rx="70" ry="8" fill="rgba(0,0,0,0.3)" opacity="0.5"/>
+          
+          <!-- Van body -->
+          <rect x="30" y="30" width="140" height="45" rx="5" fill="url(#vanGradient)"/>
+          <rect x="30" y="30" width="140" height="20" rx="5" fill="#0284c7"/>
+          
+          <!-- Cargo area with gradient -->
+          <rect x="80" y="35" width="85" height="35" rx="3" fill="#e0f2fe"/>
+          <line x1="120" y1="35" x2="120" y2="70" stroke="#38bdf8" stroke-width="2"/>
+          
+          <!-- Logo on van -->
+          <text x="125" y="57" font-size="8" fill="#38bdf8" font-weight="bold">LogiTrack</text>
+          
+          <!-- Cabin -->
+          <path d="M 30 50 L 30 35 Q 30 30 35 30 L 75 30 L 80 50 Z" fill="#0284c7"/>
+          
+          <!-- Windows with reflection -->
+          <rect x="35" y="35" width="20" height="12" rx="2" fill="#dbeafe"/>
+          <rect x="35" y="35" width="20" height="4" rx="1" fill="#ffffff" opacity="0.6"/>
+          <rect x="58" y="35" width="18" height="12" rx="2" fill="#dbeafe"/>
+          <rect x="58" y="35" width="18" height="4" rx="1" fill="#ffffff" opacity="0.6"/>
+          
+          <!-- Headlights with glow -->
+          <circle cx="25" cy="55" r="3" fill="#fbbf24" filter="url(#glow)"/>
+          <circle cx="25" cy="65" r="2" fill="#ef4444"/>
+          
+          <!-- Wheels with detail -->
+          <circle cx="50" cy="75" r="12" fill="#1e293b"/>
+          <circle cx="50" cy="75" r="8" fill="#475569"/>
+          <circle cx="50" cy="75" r="4" fill="#64748b"/>
+          <circle cx="150" cy="75" r="12" fill="#1e293b"/>
+          <circle cx="150" cy="75" r="8" fill="#475569"/>
+          <circle cx="150" cy="75" r="4" fill="#64748b"/>
+          
+          <!-- Wheel rotation lines -->
+          <line x1="48" y1="75" x2="52" y2="75" stroke="#1e293b" stroke-width="1.5"/>
+          <line x1="50" y1="73" x2="50" y2="77" stroke="#1e293b" stroke-width="1.5"/>
+          <line x1="148" y1="75" x2="152" y2="75" stroke="#1e293b" stroke-width="1.5"/>
+          <line x1="150" y1="73" x2="150" y2="77" stroke="#1e293b" stroke-width="1.5"/>
+          
+          <!-- Cargo boxes detail -->
+          <rect x="90" y="55" width="15" height="8" rx="1" fill="#38bdf8"/>
+          <rect x="110" y="55" width="15" height="8" rx="1" fill="#38bdf8"/>
+          <rect x="130" y="55" width="15" height="8" rx="1" fill="#38bdf8"/>
+          
+          <!-- Door handle -->
+          <rect x="70" y="50" width="8" height="2" rx="1" fill="#0284c7"/>
+          
+          <!-- Side mirror -->
+          <rect x="28" y="42" width="5" height="3" rx="1" fill="#0284c7"/>
+        </svg>
+        
+        <!-- Enhanced drift smoke -->
+        <div class="drift-smoke smoke-1"></div>
+        <div class="drift-smoke smoke-2"></div>
+        <div class="drift-smoke smoke-3"></div>
+        <div class="drift-smoke smoke-4"></div>
+        
+        <!-- Speed lines -->
+        <div class="speed-lines">
+          <div class="speed-line line-1"></div>
+          <div class="speed-line line-2"></div>
+          <div class="speed-line line-3"></div>
+          <div class="speed-line line-4"></div>
+        </div>
+        
+        <!-- Tire marks -->
+        <div class="tire-mark mark-1"></div>
+        <div class="tire-mark mark-2"></div>
+      </div>
+      
+      <!-- Enhanced floating elements -->
+      <div class="floating-package package-1">
+        <div class="package-glow"></div>
+        📦
+      </div>
+      <div class="floating-package package-2">
+        <div class="package-glow"></div>
+        📦
+      </div>
+      <div class="floating-package package-3">
+        <div class="package-glow"></div>
+        📦
+      </div>
+      
+      <!-- GPS pins -->
+      <div class="gps-pin pin-1">📍</div>
+      <div class="gps-pin pin-2">📍</div>
+      
+      <!-- Delivery route line -->
+      <svg class="route-line" viewBox="0 0 400 300">
+        <path d="M 50 250 Q 150 150, 350 100" stroke="#38bdf8" stroke-width="2" fill="none" stroke-dasharray="10,5" opacity="0.5"/>
+      </svg>
     </div>
   </section>
 
-  <section class="features">
-    <div class="feature-card">
-      <h3>📦 Cargo Management</h3>
-      <p>Create, track, and manage cargos efficiently.</p>
+  <section class="features fade-in-up delay-6">
+    <div class="section-header">
+      <h2>Why Choose LogiTrack?</h2>
+      <p>Everything you need to run a modern logistics operation</p>
     </div>
-    <div class="feature-card">
-      <h3>🚚 Driver Assignment</h3>
-      <p>Assign cargos to drivers seamlessly.</p>
-    </div>
-    <div class="feature-card">
-      <h3>🔐 Secure Access</h3>
-      <p>Role-based access with JWT security.</p>
+    
+    <div class="features-grid">
+      <div class="feature-card card-1">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">📦</div>
+          <div class="icon-bg"></div>
+        </div>
+        <h3>Smart Cargo Management</h3>
+        <p>Create, track, and manage thousands of shipments with AI-powered insights and real-time status updates.</p>
+        <!-- <div class="feature-link">Learn more →</div> -->
+      </div>
+      
+      <div class="feature-card card-2">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🚚</div>
+          <div class="icon-bg"></div>
+        </div>
+        <h3>Intelligent Driver Matching</h3>
+        <p>Automatically assign deliveries to the nearest available drivers using advanced routing algorithms.</p>
+        <!-- <div class="feature-link">Learn more →</div> -->
+      </div>
+      
+      <div class="feature-card card-3">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🔐</div>
+          <div class="icon-bg"></div>
+        </div>
+        <h3>Enterprise Security</h3>
+        <p>Bank-level encryption, role-based access control, and compliance with international security standards.</p>
+        <!-- <div class="feature-link">Learn more →</div> -->
+      </div>
+      
+      <div class="feature-card card-4">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">📊</div>
+          <div class="icon-bg"></div>
+        </div>
+        <h3>Advanced Analytics</h3>
+        <p>Get actionable insights with comprehensive dashboards, reports, and performance metrics.</p>
+        <!-- <div class="feature-link">Learn more →</div> -->
+      </div>
+      
+      <div class="feature-card card-5">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">⚡</div>
+          <div class="icon-bg"></div>
+        </div>
+        <h3>Lightning Fast</h3>
+        <p>Built on modern cloud infrastructure for instant updates and zero-latency operations.</p>
+        <!-- <div class="feature-link">Learn more →</div> -->
+      </div>
+      
+      <div class="feature-card card-6">
+        <div class="feature-icon-wrapper">
+          <div class="feature-icon">🌍</div>
+          <div class="icon-bg"></div>
+        </div>
+        <h3>Global Scale</h3>
+        <p>Operate across multiple regions with multi-language support and local compliance.</p>
+        <!-- <div class="feature-link">Learn more →</div> -->
+      </div>
     </div>
   </section>
 
   <footer class="footer">
-    © 2026 LogiTrack. All rights reserved.
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <span class="logo-icon">🚚</span>
+          <span>LogiTrack</span>
+        </div>
+        <p class="footer-desc">The future of logistics management</p>
+      </div>
+      
+      <div class="footer-bottom">
+        <p>© 2026 LogiTrack. All rights reserved.</p>
+        <!-- <div class="footer-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Contact</a>
+        </div> -->
+      </div>
+    </div>
   </footer>
 </div>
