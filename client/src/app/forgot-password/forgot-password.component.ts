@@ -1,17 +1,29 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { HttpService } from '../../services/http.service';
 import { Router } from '@angular/router';
 
-
 declare var Swal: any;
+
+interface Particle {
+  x: number;
+  y: number;
+  baseX: number;
+  baseY: number;
+  vx: number;
+  vy: number;
+  size: number;
+  color: string;
+}
 
 @Component({
   selector: 'app-forgot-password',
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('particleCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
+
   form: FormGroup;
   loading = false;
 
@@ -28,7 +40,7 @@ export class ForgotPasswordComponent {
   // Reset card after OTP verified
   showReset = false;
 
-  // Password UI flags (like Registration)
+  // Password UI flags
   showPassword = false;
   showConfirmPassword = false;
   showChecklist = false;
@@ -43,20 +55,28 @@ export class ForgotPasswordComponent {
   strengthLabel = '';
   strengthClass = '';
 
-  constructor(private fb: FormBuilder, private http: HttpService,private router:Router) {
+  // Particle system variables
+  private canvas!: HTMLCanvasElement;
+  private ctx!: CanvasRenderingContext2D;
+  private particles: Particle[] = [];
+  private animationFrameId: number = 0;
+  private mouse = { x: 0, y: 0 };
+  private particleCount = 100;
+  private connectionDistance = 150;
+  private mouseRadius = 200;
+
+  constructor(private fb: FormBuilder, private http: HttpService, private router: Router) {
     this.form = this.fb.group(
       {
         email: ['', [Validators.required, Validators.email]],
         otp: [''],
-
-        // reset fields (revealed after OTP verification)
         newPassword: ['', [Validators.minLength(8)]],
         confirmPassword: ['']
       },
       { validators: this.passwordMatchValidator }
     );
 
-    // Live password checks (same logic as Registration)
+    // Live password checks
     this.form.get('newPassword')?.valueChanges.subscribe((value: string) => {
       const password = value || '';
 
@@ -75,25 +95,163 @@ export class ForgotPasswordComponent {
     });
   }
 
-  get email()           { return this.form.get('email'); }
-  get otp()             { return this.form.get('otp'); }
-  get newPassword()     { return this.form.get('newPassword'); }
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    this.initParticleSystem();
+  }
+
+  ngOnDestroy(): void {
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+    }
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
+
+  // ============================================
+  // PARTICLE SYSTEM IMPLEMENTATION
+  // ============================================
+
+  initParticleSystem(): void {
+    this.canvas = this.canvasRef.nativeElement;
+    this.ctx = this.canvas.getContext('2d')!;
+
+    this.resizeCanvas();
+    this.createParticles();
+    this.animate();
+
+    window.addEventListener('resize', () => this.resizeCanvas());
+    this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    this.canvas.addEventListener('mouseleave', () => this.onMouseLeave());
+  }
+
+  resizeCanvas(): void {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+    this.createParticles();
+  }
+
+  createParticles(): void {
+    this.particles = [];
+    const colors = [
+      'rgba(102, 126, 234, 0.8)',  // Primary purple
+      'rgba(118, 75, 162, 0.8)',   // Secondary purple
+      'rgba(56, 189, 248, 0.8)',   // Light blue
+      'rgba(66, 133, 244, 0.8)',   // Google Blue
+      'rgba(99, 102, 241, 0.8)',   // Indigo
+      'rgba(139, 92, 246, 0.8)'    // Violet
+    ];
+
+    for (let i = 0; i < this.particleCount; i++) {
+      const x = Math.random() * this.canvas.width;
+      const y = Math.random() * this.canvas.height;
+
+      this.particles.push({
+        x: x,
+        y: y,
+        baseX: x,
+        baseY: y,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        size: Math.random() * 3 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)]
+      });
+    }
+  }
+
+  onMouseMove(event: MouseEvent): void {
+    const rect = this.canvas.getBoundingClientRect();
+    this.mouse.x = event.clientX - rect.left;
+    this.mouse.y = event.clientY - rect.top;
+  }
+
+  onMouseLeave(): void {
+    this.mouse.x = -1000;
+    this.mouse.y = -1000;
+  }
+
+  animate(): void {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    this.particles.forEach((particle, i) => {
+      // Mouse interaction - repel particles
+      const dx = this.mouse.x - particle.x;
+      const dy = this.mouse.y - particle.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < this.mouseRadius) {
+        const angle = Math.atan2(dy, dx);
+        const force = (this.mouseRadius - distance) / this.mouseRadius;
+        const moveX = Math.cos(angle) * force * 8;
+        const moveY = Math.sin(angle) * force * 8;
+
+        particle.x -= moveX;
+        particle.y -= moveY;
+      }
+
+      // Return to base position
+      particle.x += (particle.baseX - particle.x) * 0.05;
+      particle.y += (particle.baseY - particle.y) * 0.05;
+
+      // Add gentle floating motion
+      particle.x += particle.vx;
+      particle.y += particle.vy;
+
+      // Bounce off edges
+      if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+      if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+
+      // Draw particle
+      this.ctx.beginPath();
+      this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      this.ctx.fillStyle = particle.color;
+      this.ctx.fill();
+
+      // Draw connections
+      for (let j = i + 1; j < this.particles.length; j++) {
+        const other = this.particles[j];
+        const dx2 = particle.x - other.x;
+        const dy2 = particle.y - other.y;
+        const dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+
+        if (dist < this.connectionDistance) {
+          this.ctx.beginPath();
+          this.ctx.strokeStyle = `rgba(102, 126, 234, ${1 - dist / this.connectionDistance})`;
+          this.ctx.lineWidth = 0.5;
+          this.ctx.moveTo(particle.x, particle.y);
+          this.ctx.lineTo(other.x, other.y);
+          this.ctx.stroke();
+        }
+      }
+    });
+
+    this.animationFrameId = requestAnimationFrame(() => this.animate());
+  }
+
+  // ============================================
+  // FORM GETTERS
+  // ============================================
+
+  get email() { return this.form.get('email'); }
+  get otp() { return this.form.get('otp'); }
+  get newPassword() { return this.form.get('newPassword'); }
   get confirmPassword() { return this.form.get('confirmPassword'); }
 
-  // Password helpers
-  togglePasswordVisibility()       { this.showPassword = !this.showPassword; }
-  toggleConfirmPasswordVisibility(){ this.showConfirmPassword = !this.showConfirmPassword; }
-  hideChecklist()                  { if (this.allValid) this.showChecklist = false; }
+  // ============================================
+  // PASSWORD HELPERS
+  // ============================================
 
-  // ✅ FIX: ignore empty passwords during OTP stage so the form stays valid for Send OTP
+  togglePasswordVisibility() { this.showPassword = !this.showPassword; }
+  toggleConfirmPasswordVisibility() { this.showConfirmPassword = !this.showConfirmPassword; }
+  hideChecklist() { if (this.allValid) this.showChecklist = false; }
+
   passwordMatchValidator = (group: AbstractControl): ValidationErrors | null => {
     const p = group.get('newPassword')?.value || '';
     const c = group.get('confirmPassword')?.value || '';
 
-    // During OTP stage (both empty), don't block the form
     if (p.length === 0 && c.length === 0) return null;
-
-    // When user is on reset step, enforce equality
     return p === c ? null : { passwordMismatch: true };
   };
 
@@ -108,26 +266,28 @@ export class ForgotPasswordComponent {
     switch (score) {
       case 0:
       case 1:
-        this.strengthPercent = 20; this.strengthLabel = 'Weak';        this.strengthClass = 'strength-weak'; break;
+        this.strengthPercent = 20; this.strengthLabel = 'Weak'; this.strengthClass = 'strength-weak'; break;
       case 2:
       case 3:
-        this.strengthPercent = 50; this.strengthLabel = 'Medium';      this.strengthClass = 'strength-medium'; break;
+        this.strengthPercent = 50; this.strengthLabel = 'Medium'; this.strengthClass = 'strength-medium'; break;
       case 4:
-        this.strengthPercent = 75; this.strengthLabel = 'Strong';      this.strengthClass = 'strength-strong'; break;
+        this.strengthPercent = 75; this.strengthLabel = 'Strong'; this.strengthClass = 'strength-strong'; break;
       case 5:
         this.strengthPercent = 100; this.strengthLabel = 'Very Strong'; this.strengthClass = 'strength-very-strong'; break;
     }
   }
 
-  // Send OTP directly
+  // ============================================
+  // API METHODS
+  // ============================================
+
   onRequestReset(): void {
     this.resetMessages();
-    // ✅ Only email validity matters for this step (HTML disables by email?.invalid already)
     if (this.email?.invalid) { this.form.markAllAsTouched(); return; }
 
     this.loading = true;
     this.http.requestPasswordReset(this.form.value.email).subscribe({
-      next: (res:any) => {
+      next: (res: any) => {
         this.loading = false;
         if (res?.username) {
           this.otpSent = true;
@@ -138,16 +298,15 @@ export class ForgotPasswordComponent {
           this.successMessage = res?.message || 'If this email is registered, OTP has been sent.';
         }
       },
-      error: (err:any) => {
+      error: (err: any) => {
         this.loading = false;
-        if (err?.status === 0)       this.errorMessage = 'Cannot reach server. Check API URL/CORS.';
+        if (err?.status === 0) this.errorMessage = 'Cannot reach server. Check API URL/CORS.';
         else if (err?.status === 404) this.errorMessage = 'This email is not registered.';
         else this.errorMessage = err?.error?.message || 'Unable to send reset OTP. Please try again later.';
       }
     });
   }
 
-  // Verify OTP → show reset card after OK
   onVerifyOtp(): void {
     const otp = (this.form.value.otp || '').trim();
     if (!otp || otp.length !== 6) {
@@ -161,7 +320,7 @@ export class ForgotPasswordComponent {
         this.loading = false;
         Swal.fire('OTP Verified!', 'You can now reset your password.', 'success')
           .then(() => {
-            this.showReset = true;          // reveal reset card
+            this.showReset = true;
             this.successMessage = '';
             this.errorMessage = '';
             this.form.patchValue({ otp: '' });
@@ -176,7 +335,6 @@ export class ForgotPasswordComponent {
     });
   }
 
-  // Resend OTP
   onResendOtp(): void {
     if (this.resendDisabled || !this.registeredUsername) return;
 
@@ -193,7 +351,6 @@ export class ForgotPasswordComponent {
     });
   }
 
-  // Reset password API call
   onResetPassword(): void {
     this.resetMessages();
 
@@ -217,17 +374,16 @@ export class ForgotPasswordComponent {
             this.otpSent = false;
             this.showReset = false;
             this.registeredUsername = '';
-            this.router.navigate(['/login'])
+            this.router.navigate(['/login']);
           });
       },
-      error: (err:any) => {
+      error: (err: any) => {
         this.loading = false;
         this.errorMessage = err?.error?.message || 'Unable to update password. Please try again.';
       }
     });
   }
 
-  // utils
   private startResendTimer() {
     this.resendDisabled = true;
     this.countdown = 30;
@@ -246,5 +402,3 @@ export class ForgotPasswordComponent {
     this.errorMessage = '';
   }
 }
-
-
