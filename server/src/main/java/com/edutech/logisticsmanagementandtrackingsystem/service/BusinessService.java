@@ -20,11 +20,18 @@ import com.edutech.logisticsmanagementandtrackingsystem.repository.UserRepositor
  
 @Service
 public class BusinessService {
-    @Autowired
-    private BusinessRepository businessRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+private final BusinessRepository businessRepository;
+private final UserRepository userRepository;
+
+@Autowired
+public BusinessService(BusinessRepository businessRepository,
+                       UserRepository userRepository) {
+
+    this.businessRepository = businessRepository;
+    this.userRepository = userRepository;
+}
+
  
     public Business registerBusiness(Business business) {
         return this.businessRepository.save(business);

@@ -22,20 +22,26 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerService {
     
-    @Autowired
-    private CustomerRepository customerRepository;
- 
-    @Autowired
-    private CargoRepository cargoRepository;
+
+private final CustomerRepository customerRepository;
+    private final CargoRepository cargoRepository;
+    private final UserRepository userRepository;
+    private final EmailService emailService;
+    private final DriverRepository driverRepository;
 
     @Autowired
-    private UserRepository userRepository;
-    
-    @Autowired
-    private EmailService emailService;
+    public CustomerService(CustomerRepository customerRepository,
+                           CargoRepository cargoRepository,
+                           UserRepository userRepository,
+                           EmailService emailService,
+                           DriverRepository driverRepository) {
+        this.customerRepository = customerRepository;
+        this.cargoRepository = cargoRepository;
+        this.userRepository = userRepository;
+        this.emailService = emailService;
+        this.driverRepository = driverRepository;
+    }
 
-    @Autowired
-    private DriverRepository driverRepository;
  
     public Customer createCustomer(Customer customer) {
         return customerRepository.save(customer);

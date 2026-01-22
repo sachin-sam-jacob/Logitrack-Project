@@ -20,21 +20,25 @@ import java.util.stream.Collectors;
 @Service
 public class CargoService {
 
-    @Autowired
-    private CargoRepository cargoRepo;
+    
+private final CargoRepository cargoRepo;
+    private final BusinessRepository businessRepo;
+    private final DriverRepository driverRepo;
+    private final CloudinaryService cloudinaryService;
+    private final EmailService emailService;
 
     @Autowired
-    private BusinessRepository businessRepo;
-
-    @Autowired
-    private DriverRepository driverRepo;
-
-    @Autowired
-    private CloudinaryService cloudinaryService;
-
-    @Autowired
-    private EmailService emailService;
-
+    public CargoService(CargoRepository cargoRepo,
+                        BusinessRepository businessRepo,
+                        DriverRepository driverRepo,
+                        CloudinaryService cloudinaryService,
+                        EmailService emailService) {
+        this.cargoRepo = cargoRepo;
+        this.businessRepo = businessRepo;
+        this.driverRepo = driverRepo;
+        this.cloudinaryService = cloudinaryService;
+        this.emailService = emailService;
+    }
     /**
      * CREATE CARGO with email notification
      */

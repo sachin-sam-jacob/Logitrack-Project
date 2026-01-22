@@ -13,9 +13,12 @@ import javax.mail.internet.MimeMessage;
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
+    @Autowired
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
     /**
      * Send tracking email to customer when cargo is created
      */

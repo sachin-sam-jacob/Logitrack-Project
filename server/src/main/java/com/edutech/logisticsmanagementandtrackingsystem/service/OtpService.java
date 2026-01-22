@@ -21,11 +21,17 @@ import java.util.Random;
 @Service
 public class OtpService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    
+private final JavaMailSender mailSender;
+    private final EmailOtpRepository emailOtpRepository;
 
     @Autowired
-    private EmailOtpRepository emailOtpRepository;
+    public OtpService(JavaMailSender mailSender,
+                      EmailOtpRepository emailOtpRepository) {
+        this.mailSender = mailSender;
+        this.emailOtpRepository = emailOtpRepository;
+    }
+
 
     public void generateAndSendOtp(User user) {
         String otp = String.valueOf((int)(Math.random() * 900000) + 100000); 

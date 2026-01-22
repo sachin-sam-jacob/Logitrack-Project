@@ -19,17 +19,23 @@ import java.util.stream.Collectors;
 @Service
 public class DriverService {
  
-    @Autowired
-    private DriverRepository driverRepository;
- 
-    @Autowired
-    private CargoRepository cargoRepository;
- 
-    @Autowired
-    private UserRepository userRepository;
+
+private final DriverRepository driverRepository;
+    private final CargoRepository cargoRepository;
+    private final UserRepository userRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Autowired
-    private CloudinaryService cloudinaryService;
+    public DriverService(DriverRepository driverRepository,
+                         CargoRepository cargoRepository,
+                         UserRepository userRepository,
+                         CloudinaryService cloudinaryService) {
+        this.driverRepository = driverRepository;
+        this.cargoRepository = cargoRepository;
+        this.userRepository = userRepository;
+        this.cloudinaryService = cloudinaryService;
+    }
+
  
     public Driver createDriver(Driver driver) {
         return driverRepository.save(driver);
