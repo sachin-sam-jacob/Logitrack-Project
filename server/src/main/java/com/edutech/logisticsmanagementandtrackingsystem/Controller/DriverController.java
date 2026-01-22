@@ -22,20 +22,25 @@ import java.util.Map;
 @RequestMapping("/api/driver")
 public class DriverController {
 
-    @Autowired
-    private DriverService driverService;
+
+    private final DriverService driverService;
+    private final CargoService cargoService;
+    private final CustomerService customerService;
+    private final CargoRepository cargoRepository;
+    private final DriverRepository driverRepository;
 
     @Autowired
-    private CargoService cargoService;
-
-    @Autowired
-    private CustomerService customerService;
-
-    @Autowired
-    private CargoRepository cargoRepository;
-
-    @Autowired
-    private DriverRepository driverRepository;
+    public DriverController(DriverService driverService,
+                          CargoService cargoService,
+                          CustomerService customerService,
+                          CargoRepository cargoRepository,
+                          DriverRepository driverRepository) {
+        this.driverService = driverService;
+        this.cargoService = cargoService;
+        this.customerService = customerService;
+        this.cargoRepository = cargoRepository;
+        this.driverRepository = driverRepository;
+    }
 
     /**
      * Get assigned cargos for driver

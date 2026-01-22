@@ -26,14 +26,19 @@ import com.edutech.logisticsmanagementandtrackingsystem.service.DriverService;
 @RequestMapping("/api/user-details")
 public class UserDetailsController {
 
-    @Autowired
-    private BusinessService businessService;
+private final BusinessService businessService;
+    private final DriverService driverService;
+    private final CustomerService customerService;
 
     @Autowired
-    private DriverService driverService;
+    public UserDetailsController(BusinessService businessService,
+                          DriverService driverService,
+                          CustomerService customerService) {
+        this.businessService = businessService;
+        this.driverService = driverService;
+        this.customerService = customerService;
+    }
 
-    @Autowired
-    private CustomerService customerService;
 
     @PostMapping("/business")
     public ResponseEntity<Map<String, String>> updateBusinessDetails(

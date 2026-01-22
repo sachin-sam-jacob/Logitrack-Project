@@ -18,14 +18,13 @@ import java.util.Map;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    @Autowired
-    private DriverService driverService;
+    private final DriverService driverService;
 
     @Autowired
-    private BusinessService businessService;
+    public AdminController(DriverService driverService) {
+        this.driverService = driverService;
+    }
 
-    @Autowired
-    private CargoService cargoService;
 
     // Get all pending drivers for verification
     @GetMapping("/pending-drivers")

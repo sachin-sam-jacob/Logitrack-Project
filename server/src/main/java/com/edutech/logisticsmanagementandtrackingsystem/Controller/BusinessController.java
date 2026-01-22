@@ -21,11 +21,17 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/business")
 public class BusinessController {
 
-    @Autowired
-    private CargoService cargoService;
+   
+    private final CargoService cargoService;
+    private final DriverService driverService;
 
     @Autowired
-    private DriverService driverService;
+    public BusinessController(CargoService cargoService,
+                          DriverService driverService) {
+        this.cargoService = cargoService;
+        this.driverService = driverService;
+    }
+
 
     /**
      * Create cargo with customer email for tracking
